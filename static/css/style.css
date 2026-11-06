@@ -322,6 +322,25 @@ main {
     border-radius: 0 10px 10px 0;
 }
 
+/* Domain Filter Pills */
+.domain-pill {
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    transition: all 0.15s ease;
+}
+
+.domain-pill:hover {
+    transform: translateY(-1px);
+}
+
+/* Sticky table header */
+.sticky-top {
+    z-index: 5;
+    background-color: #f8fafc;
+}
+
 /* Print Styling for Report */
 @media print {
     nav, footer, .btn, .demo-banner {

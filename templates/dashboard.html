@@ -1,77 +1,162 @@
 {% extends "base.html" %}
 
-{% block title %}System Dashboard & Analytics — PathMatch AI{% endblock %}
+{% block title %}O*NET Occupational Knowledge Base & Analytics — PathMatch AI{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-lg-5">
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <!-- Header Section -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-2 border-bottom border-light-subtle">
         <div>
-            <h2 class="fw-bold mb-1">System Analytics & History</h2>
-            <p class="text-muted mb-0">Overview of student evaluations, occupational coverage, and recommendation runs.</p>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                    <i class="fa-solid fa-database me-1"></i> O*NET 2018 SOC Taxonomy
+                </span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                    <i class="fa-solid fa-shield-check me-1"></i> 100% Verified Standards
+                </span>
+            </div>
+            <h2 class="fw-bold mb-1">Occupational Knowledge Base & Analytics</h2>
+            <p class="text-muted mb-0">
+                Explore 72 official technical occupations, in-demand skill distributions, and student evaluation analytics.
+            </p>
         </div>
         <div class="d-flex gap-2 mt-3 mt-md-0">
-            <a href="/profile" class="btn btn-primary btn-sm">
-                <i class="fa-solid fa-plus me-1"></i> New Evaluation
+            <a href="/profile" class="btn btn-primary btn-sm px-3 shadow-sm">
+                <i class="fa-solid fa-plus me-1"></i> Evaluate New Student
+            </a>
+            <a href="/career-assistant" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="fa-solid fa-comments me-1"></i> Career Assistant
             </a>
         </div>
     </div>
 
-    <!-- Quick Stats Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-4">
-            <div class="card p-4 border-0 shadow-sm bg-white">
+    <!-- Quick Stats Cards (4 Key Metrics) -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 border-0 shadow-sm bg-white h-100">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-muted small fw-semibold">TOTAL RUNS</div>
-                        <h2 class="fw-extrabold mb-0 mt-1">{{ total_runs }}</h2>
+                        <div class="text-muted small fw-semibold text-uppercase">O*NET Occupations</div>
+                        <h2 class="fw-extrabold mb-0 mt-1" id="statTotalOccupations">{{ total_occupations }}</h2>
+                        <small class="text-muted">Standard SOC taxonomy</small>
                     </div>
                     <div class="p-3 bg-primary-subtle text-primary rounded-3">
-                        <i class="fa-solid fa-bolt fa-2xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-4 border-0 shadow-sm bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="text-muted small fw-semibold">O*NET OCCUPATIONS</div>
-                        <h2 class="fw-extrabold mb-0 mt-1">{{ total_occupations }}</h2>
-                    </div>
-                    <div class="p-3 bg-success-subtle text-success rounded-3">
                         <i class="fa-solid fa-database fa-2xl"></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card p-4 border-0 shadow-sm bg-white">
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 border-0 shadow-sm bg-white h-100">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <div class="text-muted small fw-semibold">STUDENT PROFILES</div>
-                        <h2 class="fw-extrabold mb-0 mt-1">{{ total_students }}</h2>
+                        <div class="text-muted small fw-semibold text-uppercase">Cataloged Skills</div>
+                        <h2 class="fw-extrabold mb-0 mt-1" id="statTotalSkills">{{ total_skills or 195 }}</h2>
+                        <small class="text-muted">Required competencies</small>
+                    </div>
+                    <div class="p-3 bg-success-subtle text-success rounded-3">
+                        <i class="fa-solid fa-code fa-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 border-0 shadow-sm bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold text-uppercase">Tech Tools & Stacks</div>
+                        <h2 class="fw-extrabold mb-0 mt-1" id="statTotalTech">{{ total_technologies or 188 }}</h2>
+                        <small class="text-muted">Frameworks & toolchains</small>
                     </div>
                     <div class="p-3 bg-info-subtle text-info rounded-3">
-                        <i class="fa-solid fa-users fa-2xl"></i>
+                        <i class="fa-solid fa-screwdriver-wrench fa-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="card p-3 border-0 shadow-sm bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold text-uppercase">Evaluations Run</div>
+                        <h2 class="fw-extrabold mb-0 mt-1" id="statTotalRuns">{{ total_runs }}</h2>
+                        <small class="text-muted">Student profiles matched</small>
+                    </div>
+                    <div class="p-3 bg-warning-subtle text-warning-emphasis rounded-3">
+                        <i class="fa-solid fa-bolt fa-2xl"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Charts Row -->
-    <div class="row g-4 mb-5">
+    <!-- Charts Row 1: Dataset Intelligence (Top Skills & Domain Distribution) -->
+    <div class="row g-4 mb-4">
         <div class="col-lg-6">
             <div class="card p-4 border-0 shadow-sm bg-white h-100">
-                <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Occupational Domain Distribution</h5>
-                <div style="height: 280px; position: relative;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-chart-bar text-primary me-2"></i>Most In-Demand Skills in Tech & AI
+                        </h5>
+                        <small class="text-muted">Frequency across all 72 O*NET computing occupations</small>
+                    </div>
+                    <span class="badge bg-light text-dark border">Dataset Metric</span>
+                </div>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card p-4 border-0 shadow-sm bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-chart-pie text-success me-2"></i>Occupational Domain Distribution
+                        </h5>
+                        <small class="text-muted">Breakdown of cataloged roles by technical sector</small>
+                    </div>
+                    <span class="badge bg-light text-dark border">10 Domains</span>
+                </div>
+                <div style="height: 300px; position: relative;">
                     <canvas id="domainChart"></canvas>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Charts Row 2: Technologies & Recommendation Fit -->
+    <div class="row g-4 mb-5">
         <div class="col-lg-6">
             <div class="card p-4 border-0 shadow-sm bg-white h-100">
-                <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-column text-success me-2"></i>Sample Suitability Score Distribution</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-cubes text-info me-2"></i>Top Developer Frameworks & Tools
+                        </h5>
+                        <small class="text-muted">Most common industry toolchains mapped to roles</small>
+                    </div>
+                    <span class="badge bg-light text-dark border">Tooling Index</span>
+                </div>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="techChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card p-4 border-0 shadow-sm bg-white h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-0">
+                            <i class="fa-solid fa-chart-column text-warning me-2"></i>Suitability Score Distribution
+                        </h5>
+                        <small class="text-muted">AI-evaluated role match score tiers across student runs</small>
+                    </div>
+                    <span class="badge bg-light text-dark border">Evaluation Runs</span>
+                </div>
                 <div style="height: 280px; position: relative;">
                     <canvas id="scoreDistChart"></canvas>
                 </div>
@@ -79,9 +164,93 @@
         </div>
     </div>
 
+    <!-- Interactive O*NET Occupational Knowledge Base Explorer -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-5" id="datasetExplorer">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+            <div>
+                <h4 class="fw-bold mb-1">
+                    <i class="fa-solid fa-book-atlas text-primary me-2"></i>O*NET Occupational Knowledge Base Explorer
+                </h4>
+                <p class="text-muted small mb-0">
+                    Search and browse official U.S. DOL occupational requirements, core skills, and tech stacks.
+                </p>
+            </div>
+            <div class="mt-2 mt-md-0">
+                <span class="badge bg-light text-secondary border px-3 py-2 small" id="occupationsCountBadge">
+                    Showing <strong class="text-dark" id="visibleOccCount">72</strong> of <span id="totalOccCount">72</span> roles
+                </span>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="row g-2 mb-3">
+            <div class="col-md-6 col-lg-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                    </span>
+                    <input type="text" id="occSearchInput" class="form-control border-start-0 ps-0" placeholder="Search occupation title, SOC code, or skill (e.g. Python, Cloud, 15-1252)...">
+                    <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" title="Clear search">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="d-flex flex-wrap gap-1 align-items-center" id="domainFilterPills">
+                    <button class="btn btn-sm btn-primary active domain-pill" data-domain="ALL">
+                        All (72)
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary domain-pill" data-domain="Data Science & AI">
+                        AI & Data
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary domain-pill" data-domain="Software Engineering">
+                        Software Eng
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary domain-pill" data-domain="Web & Mobile Development">
+                        Web & Mobile
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary domain-pill" data-domain="Cybersecurity & Networking">
+                        Cybersecurity
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary domain-pill" data-domain="Cloud & DevOps">
+                        DevOps & Cloud
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Occupations Table -->
+        <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+            <table class="table table-hover align-middle mb-0" id="occupationsTable">
+                <thead class="table-light small sticky-top">
+                    <tr>
+                        <th style="width: 120px;">SOC Code</th>
+                        <th style="min-width: 200px;">Occupation Title</th>
+                        <th style="width: 170px;">Domain</th>
+                        <th style="min-width: 240px;">Core Required Skills</th>
+                        <th style="min-width: 180px;">Tech Stacks</th>
+                        <th style="width: 110px;" class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="small" id="occupationsTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-spinner fa-spin me-2"></i> Loading O*NET occupational dataset...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <!-- History Table -->
     <div class="card p-4 border-0 shadow-sm bg-white mb-5">
-        <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i>Recent Recommendation Runs</h5>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">
+                <i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i>Recent Recommendation Runs
+            </h5>
+            <span class="badge bg-light text-dark border">{{ runs|length }} Records</span>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light small">
@@ -120,8 +289,8 @@
                             <a href="/recommendations?run_id={{ run.id }}" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem;">
                                 Results
                             </a>
-                            <a href="/roadmap?run_id={{ run.id }}" class="btn btn-sm btn-outline-secondary py-0 px-2 ms-1" style="font-size: 0.8rem;">
-                                Roadmap
+                            <a href="/career-assistant?student_id={{ run.student_id }}" class="btn btn-sm btn-outline-secondary py-0 px-2 ms-1" style="font-size: 0.8rem;">
+                                Ask AI
                             </a>
                         </td>
                     </tr>
@@ -135,6 +304,77 @@
         </div>
     </div>
 </div>
+
+<!-- Occupation Specification Modal -->
+<div class="modal fade" id="occupationModal" tabindex="-1" aria-labelledby="occModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-dark font-monospace" id="modalSocCode">15-1252.00</span>
+                        <span class="badge bg-primary-subtle text-primary" id="modalDomain">Software Engineering</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">
+                            <i class="fa-solid fa-shield-check me-1"></i> O*NET Verified
+                        </span>
+                    </div>
+                    <h4 class="modal-title fw-bold" id="occModalTitle">Software Developer</h4>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-3">
+                    <h6 class="fw-bold text-dark"><i class="fa-solid fa-circle-info text-primary me-2"></i>Official O*NET Description</h6>
+                    <p class="text-secondary small mb-0" id="modalDescription"></p>
+                </div>
+
+                <div class="mb-3 p-3 bg-light rounded-3">
+                    <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-graduation-cap text-success me-2"></i>Typical Education Requirement</h6>
+                    <div class="small text-secondary" id="modalEducation">Bachelor's Degree in Computer Science or Software Engineering</div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <h6 class="fw-bold text-dark mb-2">
+                                <i class="fa-solid fa-list-check text-primary me-2"></i>Core Required Skills
+                            </h6>
+                            <div class="d-flex flex-wrap gap-1" id="modalSkills"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded-3 h-100">
+                            <h6 class="fw-bold text-dark mb-2">
+                                <i class="fa-solid fa-terminal text-info me-2"></i>Key Technology Stacks
+                            </h6>
+                            <div class="d-flex flex-wrap gap-1" id="modalTech"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h6 class="fw-bold text-dark mb-2">
+                        <i class="fa-solid fa-brain text-warning me-2"></i>Core Knowledge Areas
+                    </h6>
+                    <ul class="small text-secondary ps-3 mb-0" id="modalKnowledge"></ul>
+                </div>
+
+                <div>
+                    <h6 class="fw-bold text-dark mb-2">
+                        <i class="fa-solid fa-briefcase text-secondary me-2"></i>Typical Work Activities
+                    </h6>
+                    <ul class="small text-secondary ps-3 mb-0" id="modalActivities"></ul>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                <a href="/profile" class="btn btn-primary btn-sm" id="modalProfileLink">
+                    <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Test My Fit for This Role
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -142,4 +382,3 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="{{ url_static('js/dashboard.js') if url_static is defined else '/static/js/dashboard.js' }}"></script>
 {% endblock %}
-

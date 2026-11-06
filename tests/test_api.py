@@ -31,7 +31,6 @@ def test_web_routes(client):
         "/profile",
         "/recommendations",
         "/dashboard",
-        "/roadmap",
         "/methodology",
         "/career-assistant"
     ]
@@ -39,6 +38,25 @@ def test_web_routes(client):
         resp = client.get(r)
         assert resp.status_code == 200, f"Route {r} returned status {resp.status_code}"
         assert b"PathMatch" in resp.data
+
+    # Legacy roadmap route should redirect cleanly
+    resp_roadmap = client.get("/roadmap")
+    assert resp_roadmap.status_code == 302
+
+
+def test_api_dashboard_stats(client):
+    """Test enriched dashboard statistics and dataset explorer endpoint."""
+    resp = client.get("/api/dashboard/stats")
+    assert resp.status_code == 200
+    data = resp.get_json()
+    assert data["status"] == "success"
+    assert data["total_occupations"] >= 70
+    assert data["total_skills"] > 100
+    assert data["total_technologies"] > 100
+    assert len(data["top_skills"]) > 0
+    assert len(data["top_technologies"]) > 0
+    assert len(data["domain_distribution"]) > 0
+    assert len(data["occupations"]) >= 70
 
 
 def test_api_sample_profiles(client):
