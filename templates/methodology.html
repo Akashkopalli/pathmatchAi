@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}System Methodology & LLM Architecture — PathMatch AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Architecture & Methodology</h2>
+        <p class="text-muted mb-0">SIH25034 — Technical documentation of the PathMatch Multi-Agent LLM Engine.</p>
+    </div>
+
+    <!-- Section 1: Pure LLM Principle -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+        <h4 class="fw-bold text-primary mb-3"><i class="fa-solid fa-microchip me-2"></i>1. Core Principle: Pure LLM Recommendation</h4>
+        <p class="text-muted">
+            Conventional recommendation systems rely on lexical keyword matching (TF-IDF, Bag-of-Words) or mathematical vector distance (Cosine similarity, Sentence Transformers). While simple, traditional methods fail to grasp <strong>transferable competencies</strong>, project context, or prerequisite dependencies.
+        </p>
+
+        <div class="row g-3 my-2">
+            <div class="col-md-6">
+                <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle">
+                    <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-ban me-1"></i> Strictly Prohibited in Recommendation Engine:</h6>
+                    <ul class="mb-0 small text-danger-emphasis ps-3">
+                        <li>TF-IDF & TfidfVectorizer</li>
+                        <li>Cosine similarity calculations</li>
+                        <li>Sentence Transformers & Embedding similarity</li>
+                        <li>Random Forest, SVM, Logistic Regression</li>
+                        <li>Traditional keyword-overlap ranking</li>
+                        <li>Hardcoded weighted similarity formulas</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle">
+                    <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-circle-check me-1"></i> Performed Exclusively by LLM Reasoning:</h6>
+                    <ul class="mb-0 small text-success-emphasis ps-3">
+                        <li>Natural-language profile and resume understanding</li>
+                        <li>Skill extraction and normalization</li>
+                        <li>Transferable skill identification without exaggeration</li>
+                        <li>O*NET requirement interpretation</li>
+                        <li>Semantic role suitability evaluation (6 dimensions)</li>
+                        <li>Comparative role ranking, skill gaps & roadmaps</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-muted small mt-2 mb-0">
+            Python acts strictly as the <strong>orchestration layer</strong>: handling database retrieval, input sanitation, structured JSON validation, token tracking, and web persistence.
+        </p>
+    </div>
+
+    <!-- Section 2: Multi-Agent System Workflow -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-network-wired text-info me-2"></i>2. PathMatch Multi-Agent Architecture</h4>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <span class="badge bg-primary mb-2">Agent 1</span>
+                    <h6 class="fw-bold">Student Profile Understanding Agent</h6>
+                    <p class="small text-muted mb-0">Converts unstructured student resumes and text into validated JSON, distinguishing explicit skills from project inferences without inventing proficiencies.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <span class="badge bg-secondary mb-2">Agent 2</span>
+                    <h6 class="fw-bold">Skill Intelligence Agent</h6>
+                    <p class="small text-muted mb-0">Classifies confirmed, related, transferable, and verification-required skills. Strictly prohibits related skills from becoming confirmed student skills.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <span class="badge bg-success mb-2">Agent 3</span>
+                    <h6 class="fw-bold">Occupational Knowledge Retrieval Agent</h6>
+                    <p class="small text-muted mb-0">Queries SQLite for relevant O*NET SOC records based on domains and tags. Passes candidate records as prompt context to prevent database flooding.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <span class="badge bg-danger mb-2">Agent 4</span>
+                    <h6 class="fw-bold">LLM Role Evaluation & Recommendation Agent</h6>
+                    <p class="small text-muted mb-0">The core intelligence. Evaluates candidate occupations across 6 dimensions, synthesizes comparative match scores (0-100), and ranks top occupations.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <span class="badge bg-warning text-dark mb-2">Agent 5</span>
+                    <h6 class="fw-bold">Skill Gap Analysis Agent</h6>
+                    <p class="small text-muted mb-0">Conducts comparative competency audits, highlighting missing essential tools, additional frameworks, and actionable improvement steps.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3 h-100">
+                    <span class="badge bg-info text-white mb-2">Agent 6 & 7</span>
+                    <h6 class="fw-bold">Roadmap & Career Assistant Agents</h6>
+                    <p class="small text-muted mb-0">Agent 6 synthesizes 30-60-90 day milestone roadmaps with exercises and mini-projects. Agent 7 provides interactive conversational career guidance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 3: 6-Dimension Evaluation Rubric -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-list-check text-warning me-2"></i>3. Six-Dimension Evaluation Rubric</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0 small">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 25%;">Evaluation Dimension</th>
+                        <th style="width: 15%;">Target Weight</th>
+                        <th>Evaluation Criteria Handled by LLM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">1. Required Skill Alignment</td>
+                        <td class="font-monospace text-primary">~30%</td>
+                        <td>Direct overlap between student confirmed skills and core occupational requirements in O*NET.</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">2. Transferable Skill Alignment</td>
+                        <td class="font-monospace text-primary">~20%</td>
+                        <td>Foundational capabilities (e.g. OOP, algorithmic problem solving) that facilitate rapid learning.</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">3. Project Relevance</td>
+                        <td class="font-monospace text-primary">~20%</td>
+                        <td>Verifiable practical implementation evidence demonstrated in student portfolio projects.</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">4. Interest Alignment</td>
+                        <td class="font-monospace text-primary">~15%</td>
+                        <td>Synergy between student declared career interests, stated goals, and daily occupational work activities.</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">5. Educational Suitability</td>
+                        <td class="font-monospace text-primary">~10%</td>
+                        <td>Compatibility of degree program and specialization with standard occupational entry requirements.</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">6. Experience Suitability</td>
+                        <td class="font-monospace text-primary">~5%</td>
+                        <td>Appropriateness of scope for college student internship or early-career placement.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section 4: Data Policy & Limitations -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-5">
+        <h4 class="fw-bold text-dark mb-3"><i class="fa-solid fa-shield-halved text-success me-2"></i>4. Data Source Policy & Critical Clarifications</h4>
+        <div class="alert alert-warning border-0 small mb-3">
+            <i class="fa-solid fa-triangle-exclamation me-1"></i>
+            <strong>Important Policy:</strong> PathMatch AI recommends <em>occupational role categories and career standards</em> from the official O*NET database. It does <strong>NOT</strong> recommend verified live employer vacancies, nor does it display fictional hiring companies, fake salaries, or fabricated vacancies.
+        </div>
+        <p class="text-muted small mb-0">
+            <strong>Match Score Interpretation:</strong> A match score of 88/100 represents an AI-generated comparative suitability ranking based on rubric evaluation. It is not a statistically validated probability of getting hired or a guarantee of employment.
+        </p>
+    </div>
+</div>
+{% endblock %}
+

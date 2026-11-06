@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Personalized Learning Roadmap — PathMatch AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Personalized Learning Roadmap</h2>
+            <p class="text-muted mb-0">Agent 6: Actionable 30, 60, and 90-day milestone career preparation plans.</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="/recommendations{% if run_data %}?run_id={{ run_data.run.id }}{% endif %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Recommendations
+            </a>
+        </div>
+    </div>
+
+    {% if not run_data or not run_data.roadmap %}
+    <div class="card p-5 text-center border-0 shadow-sm bg-white">
+        <div class="display-3 text-secondary mb-3">
+            <i class="fa-solid fa-map-location-dot"></i>
+        </div>
+        <h4 class="fw-bold mb-2">No Active Roadmap Found</h4>
+        <p class="text-muted mb-4">Run the recommendation pipeline on a student profile to generate a tailored milestone roadmap.</p>
+        <div>
+            <a href="/profile" class="btn btn-primary px-4">Start with Student Profile</a>
+        </div>
+    </div>
+    {% else %}
+    <!-- Roadmap Target Badge -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary">Target Occupation</span>
+                    <span class="text-muted small font-monospace">Run #{{ run_data.run.id }}</span>
+                </div>
+                <h3 class="fw-bold mb-1 text-dark">{{ run_data.roadmap.target_occupation }}</h3>
+                <p class="text-muted small mb-0">
+                    Prepared for student: <strong>{{ run_data.run.student_name }}</strong> &bull; Tailored to close identified prerequisite gaps.
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <div class="badge bg-light text-secondary border p-2 font-monospace">
+                    <i class="fa-solid fa-graduation-cap text-primary me-1"></i> 3-Milestone Path
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Readiness Progress Bar -->
+        <div class="border-top border-light-subtle pt-3 mt-3">
+            <div class="d-flex justify-content-between align-items-center small mb-1">
+                <span class="fw-bold text-dark"><i class="fa-solid fa-bars-progress text-primary me-1"></i> Your Roadmap Completion Progress:</span>
+                <span class="fw-bold font-monospace text-primary" id="progressPercentage">0% Completed</span>
+            </div>
+            <div class="progress" style="height: 10px; border-radius: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="roadmapProgressBar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="text-muted mt-1" style="font-size: 0.75rem;">
+                Check off topics as you learn them below to track your internship preparation progress!
+            </div>
+        </div>
+    </div>
+
+    <!-- Milestone Navigation Tabs -->
+    <ul class="nav nav-pills nav-fill mb-4 bg-white p-2 rounded shadow-sm border border-light-subtle" id="roadmapTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-bold py-2" id="day30-tab" data-bs-toggle="pill" data-bs-target="#day30" type="button" role="tab">
+                <i class="fa-solid fa-seedling me-1"></i> Milestone 1: 30-Day Foundations
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold py-2" id="day60-tab" data-bs-toggle="pill" data-bs-target="#day60" type="button" role="tab">
+                <i class="fa-solid fa-cube me-1"></i> Milestone 2: 60-Day Workflows & Cloud
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold py-2" id="day90-tab" data-bs-toggle="pill" data-bs-target="#day90" type="button" role="tab">
+                <i class="fa-solid fa-trophy me-1"></i> Milestone 3: 90-Day Capstone & Readiness
+            </button>
+        </li>
+    </ul>
+
+    <!-- Milestone Tabs Content -->
+    <div class="tab-content mb-5" id="roadmapTabContent">
+        <!-- 30 Days -->
+        <div class="tab-pane fade show active" id="day30" role="tabpanel">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-flag-checkered me-2"></i>First 30 Days: Core Prerequisite Tooling & Hygiene</h5>
+                <div class="row g-4">
+                    {% for item in run_data.roadmap.roadmap_30_days %}
+                    <div class="col-md-6">
+                        <div class="timeline-item p-3 bg-light rounded-3 h-100">
+                            <span class="badge bg-primary mb-2">{{ item.week or 'Weeks 1-2' }}</span>
+                            <h5 class="fw-bold mb-2">{{ item.skill_to_learn }}</h5>
+                            <p class="small text-muted mb-2"><strong>Objective:</strong> {{ item.learning_objective }}</p>
+
+                            {% if item.suggested_topics %}
+                            <div class="small mb-2">
+                                <strong class="text-dark">Topics:</strong>
+                                <ul class="mb-1 ps-3 text-secondary">
+                                    {% for t in item.suggested_topics %}<li>{{ t }}</li>{% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            {% if item.practical_exercises %}
+                            <div class="small mb-2">
+                                <strong class="text-dark">Hands-on Exercises:</strong>
+                                <ul class="mb-1 ps-3 text-secondary">
+                                    {% for ex in item.practical_exercises %}<li>{{ ex }}</li>{% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            {% if item.mini_project %}
+                            <div class="p-2 bg-white rounded border border-light-subtle small mt-3">
+                                <strong class="text-success"><i class="fa-solid fa-laptop-code me-1"></i> Mini-Project:</strong>
+                                <span>{{ item.mini_project }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-muted small">Standard foundational 30-day curriculum active.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 60 Days -->
+        <div class="tab-pane fade" id="day60" role="tabpanel">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-flag-checkered me-2"></i>Days 31 to 60: Continuous Delivery & Intermediate Tooling</h5>
+                <div class="row g-4">
+                    {% for item in run_data.roadmap.roadmap_60_days %}
+                    <div class="col-md-6">
+                        <div class="timeline-item p-3 bg-light rounded-3 h-100">
+                            <span class="badge bg-info text-white mb-2">{{ item.month or 'Month 2' }}</span>
+                            <h5 class="fw-bold mb-2">{{ item.skill_to_learn }}</h5>
+                            <p class="small text-muted mb-2"><strong>Objective:</strong> {{ item.learning_objective }}</p>
+
+                            {% if item.suggested_topics %}
+                            <div class="small mb-2">
+                                <strong class="text-dark">Topics:</strong>
+                                <ul class="mb-1 ps-3 text-secondary">
+                                    {% for t in item.suggested_topics %}<li>{{ t }}</li>{% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            {% if item.mini_project %}
+                            <div class="p-2 bg-white rounded border border-light-subtle small mt-3">
+                                <strong class="text-success"><i class="fa-solid fa-laptop-code me-1"></i> Intermediate Project:</strong>
+                                <span>{{ item.mini_project }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-muted small">60-day development modules active.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 90 Days -->
+        <div class="tab-pane fade" id="day90" role="tabpanel">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <h5 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-flag-checkered me-2"></i>Days 61 to 90: Production Capstone & Interview Readiness</h5>
+                <div class="row g-4">
+                    {% for item in run_data.roadmap.roadmap_90_days %}
+                    <div class="col-md-6">
+                        <div class="timeline-item p-3 bg-light rounded-3 h-100">
+                            <span class="badge bg-success mb-2">{{ item.month or 'Month 3' }}</span>
+                            <h5 class="fw-bold mb-2">{{ item.skill_to_learn }}</h5>
+                            <p class="small text-muted mb-2"><strong>Objective:</strong> {{ item.learning_objective }}</p>
+
+                            {% if item.suggested_topics %}
+                            <div class="small mb-2">
+                                <strong class="text-dark">Topics:</strong>
+                                <ul class="mb-1 ps-3 text-secondary">
+                                    {% for t in item.suggested_topics %}<li>{{ t }}</li>{% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            {% if item.mini_project %}
+                            <div class="p-2 bg-white rounded border border-light-subtle small mt-3">
+                                <strong class="text-success"><i class="fa-solid fa-trophy me-1"></i> Portfolio Capstone:</strong>
+                                <span>{{ item.mini_project }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-muted small">90-day capstone requirements active.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vetted Resources Box -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-5">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-book-bookmark text-primary me-2"></i>Official & Vetted Learning Hubs</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3">
+                    <h6 class="fw-bold mb-1">MDN Web Docs</h6>
+                    <p class="text-muted small mb-2">Standard web and frontend specifications, JavaScript API references, and accessible markup tutorials.</p>
+                    <a href="https://developer.mozilla.org" target="_blank" class="small text-decoration-none">developer.mozilla.org <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3">
+                    <h6 class="fw-bold mb-1">O*NET Online</h6>
+                    <p class="text-muted small mb-2">Official occupational tasks, work activities, and detailed knowledge areas for computing professionals.</p>
+                    <a href="https://www.onetonline.org" target="_blank" class="small text-decoration-none">www.onetonline.org <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded-3">
+                    <h6 class="fw-bold mb-1">GitHub Skills & Docs</h6>
+                    <p class="text-muted small mb-2">Interactive Git workflows, GitHub Actions CI/CD pipelines, and open-source collaboration patterns.</p>
+                    <a href="https://skills.github.com" target="_blank" class="small text-decoration-none">skills.github.com <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Add interactive checkboxes to each list item in timeline
+    const listItems = document.querySelectorAll(".timeline-item ul li");
+    listItems.forEach((li, idx) => {
+        const text = li.textContent.trim();
+        const checkId = `roadmap_check_${idx}`;
+        const isChecked = localStorage.getItem(checkId) === "true";
+        li.innerHTML = `
+            <div class="form-check form-check-inline m-0">
+                <input class="form-check-input roadmap-checkbox" type="checkbox" id="${checkId}" ${isChecked ? 'checked' : ''} onchange="updateReadinessProgress('${checkId}')">
+                <label class="form-check-label ${isChecked ? 'text-decoration-line-through text-muted' : ''}" for="${checkId}">${text}</label>
+            </div>
+        `;
+    });
+    updateProgressDisplay();
+});
+
+function updateReadinessProgress(checkId) {
+    const el = document.getElementById(checkId);
+    if (el) {
+        localStorage.setItem(checkId, el.checked);
+        const label = el.nextElementSibling;
+        if (label) {
+            if (el.checked) {
+                label.classList.add("text-decoration-line-through", "text-muted");
+            } else {
+                label.classList.remove("text-decoration-line-through", "text-muted");
+            }
+        }
+    }
+    updateProgressDisplay();
+}
+
+function updateProgressDisplay() {
+    const allChecks = document.querySelectorAll(".roadmap-checkbox");
+    if (allChecks.length === 0) return;
+    const checkedCount = document.querySelectorAll(".roadmap-checkbox:checked").length;
+    const pct = Math.round((checkedCount / allChecks.length) * 100);
+
+    const bar = document.getElementById("roadmapProgressBar");
+    const label = document.getElementById("progressPercentage");
+    if (bar) {
+        bar.style.width = pct + "%";
+        bar.setAttribute("aria-valuenow", pct);
+    }
+    if (label) {
+        label.textContent = `${pct}% Completed (${checkedCount}/${allChecks.length} topics)`;
+    }
+}
+</script>
+{% endblock %}
+

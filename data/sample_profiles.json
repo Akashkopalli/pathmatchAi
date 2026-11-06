@@ -1,0 +1,289 @@
+[
+  {
+    "name": "Rahul",
+    "degree": "Computer Science",
+    "specialization": "Data Analytics",
+    "education_level": "Undergraduate (3rd Year)",
+    "skills": [
+      {
+        "name": "Python",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "SQL",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Excel",
+        "evidence": "Explicitly provided",
+        "proficiency": "Advanced"
+      },
+      {
+        "name": "Data Visualization",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Statistics",
+        "evidence": "Explicitly provided",
+        "proficiency": "Beginner"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Sales Performance Dashboard",
+        "technologies": [
+          "Python",
+          "SQL",
+          "Excel",
+          "Data Visualization"
+        ],
+        "description": "Constructed an executive dashboard summarizing multi-region sales performance, metrics, and quarterly trends."
+      }
+    ],
+    "interests": [
+      "Data Analysis",
+      "Business Insights"
+    ],
+    "career_goals": [
+      "Data Analyst",
+      "Business Intelligence Specialist"
+    ],
+    "natural_input": "I am a 3rd year Computer Science student skilled in Python, SQL, Excel, Data Visualization, and Statistics. I built a sales performance dashboard and I am keenly interested in Data Analysis and Business Insights."
+  },
+  {
+    "name": "Ananya",
+    "degree": "Computer Science",
+    "specialization": "Web Development & Design",
+    "education_level": "Undergraduate (3rd Year)",
+    "skills": [
+      {
+        "name": "HTML",
+        "evidence": "Explicitly provided",
+        "proficiency": "Advanced"
+      },
+      {
+        "name": "CSS",
+        "evidence": "Explicitly provided",
+        "proficiency": "Advanced"
+      },
+      {
+        "name": "JavaScript",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "React",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Figma",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Git",
+        "evidence": "Explicitly provided",
+        "proficiency": "Beginner"
+      }
+    ],
+    "projects": [
+      {
+        "name": "E-Commerce Product Explorer",
+        "technologies": [
+          "React",
+          "JavaScript",
+          "HTML",
+          "CSS",
+          "Figma"
+        ],
+        "description": "Designed high-fidelity wireframes in Figma and coded a responsive React single-page product catalog with cart state."
+      }
+    ],
+    "interests": [
+      "Frontend Development",
+      "UI Design"
+    ],
+    "career_goals": [
+      "Frontend Developer",
+      "UI/UX Designer"
+    ],
+    "natural_input": "I know HTML, CSS, JavaScript, React, Figma, and Git. I built a responsive e-commerce web app after designing mockups in Figma. I am passionate about Frontend Development and UI Design."
+  },
+  {
+    "name": "Mohit",
+    "degree": "Computer Science",
+    "specialization": "Software Systems",
+    "education_level": "Undergraduate (Final Year)",
+    "skills": [
+      {
+        "name": "Java",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "OOP",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "MySQL",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Spring Boot",
+        "evidence": "Explicitly provided",
+        "proficiency": "Beginner"
+      },
+      {
+        "name": "REST API",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Student Attendance Microservice",
+        "technologies": [
+          "Java",
+          "Spring Boot",
+          "MySQL",
+          "REST API"
+        ],
+        "description": "Architected a secure REST API backend with Java and Spring Boot connecting to MySQL for attendance tracking."
+      }
+    ],
+    "interests": [
+      "Backend Development"
+    ],
+    "career_goals": [
+      "Backend Java Developer",
+      "Software Engineer"
+    ],
+    "natural_input": "I have solid experience in Java, Object-Oriented Programming (OOP), MySQL, Spring Boot, and REST API development. I designed a student attendance microservice and my main interest is in Backend Development."
+  },
+  {
+    "name": "Sneha",
+    "degree": "Computer Science / AI",
+    "specialization": "Artificial Intelligence",
+    "education_level": "Undergraduate (Final Year)",
+    "skills": [
+      {
+        "name": "Python",
+        "evidence": "Explicitly provided",
+        "proficiency": "Advanced"
+      },
+      {
+        "name": "Machine Learning",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Pandas",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "NumPy",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Scikit-learn",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Matplotlib",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Predictive Sentiment Classifier",
+        "technologies": [
+          "Python",
+          "Scikit-learn",
+          "Pandas",
+          "NumPy",
+          "Matplotlib"
+        ],
+        "description": "Trained predictive regression and classification pipelines using Scikit-learn with rigorous cross-validation."
+      }
+    ],
+    "interests": [
+      "Artificial Intelligence",
+      "Data Science"
+    ],
+    "career_goals": [
+      "Machine Learning Engineer",
+      "AI Researcher"
+    ],
+    "natural_input": "I study Computer Science and AI. My technical stack includes Python, Machine Learning, Pandas, NumPy, Scikit-learn, and Matplotlib. I built a predictive classifier and want to work in Artificial Intelligence and Data Science."
+  },
+  {
+    "name": "Arjun",
+    "degree": "Computer Science",
+    "specialization": "Network Security",
+    "education_level": "Undergraduate (3rd Year)",
+    "skills": [
+      {
+        "name": "C",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "C++",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Computer Networks",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Linux",
+        "evidence": "Explicitly provided",
+        "proficiency": "Intermediate"
+      },
+      {
+        "name": "Cybersecurity Basics",
+        "evidence": "Explicitly provided",
+        "proficiency": "Beginner"
+      },
+      {
+        "name": "Wireshark",
+        "evidence": "Explicitly provided",
+        "proficiency": "Beginner"
+      }
+    ],
+    "projects": [
+      {
+        "name": "Packet Sniffing and Port Scanner Tool",
+        "technologies": [
+          "C",
+          "C++",
+          "Linux",
+          "Computer Networks",
+          "Wireshark"
+        ],
+        "description": "Developed a raw socket network scanner on Linux to inspect packet headers and identify open TCP ports."
+      }
+    ],
+    "interests": [
+      "Networking",
+      "Cybersecurity"
+    ],
+    "career_goals": [
+      "Information Security Analyst",
+      "Network Engineer"
+    ],
+    "natural_input": "I have skills in C, C++, Computer Networks, Linux, Cybersecurity Basics, and Wireshark. I developed a Linux-based packet analysis tool and my core interests are Networking and Cybersecurity."
+  }
+]

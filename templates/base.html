@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PathMatch AI — Intelligent Internship Role Recommendation Engine{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="{{ url_static('css/style.css') if url_static is defined else '/static/css/style.css' }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Top Demo Mode Banner if active -->
+    {% if is_demo_mode %}
+    <div class="demo-banner bg-warning-subtle text-warning-emphasis border-bottom border-warning py-1 px-3 text-center small font-monospace">
+        <i class="fa-solid fa-flask-vial me-2"></i>
+        <strong>DEMO MODE ACTIVE:</strong> Pure LLM agent reasoning simulated offline. Live external API credentials not configured. Fully functional for hackathon demonstration.
+    </div>
+    {% endif %}
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm border-bottom border-secondary-subtle">
+        <div class="container-fluid px-lg-5">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <div class="brand-icon me-2">
+                    <i class="fa-solid fa-compass fa-lg text-primary"></i>
+                </div>
+                <div>
+                    <span class="fw-bold tracking-tight text-white">PathMatch</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1 text-uppercase" style="font-size: 0.65rem;">AI Engine</span>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/' else '' }}" href="/">
+                            <i class="fa-solid fa-house me-1"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/profile' else '' }}" href="/profile">
+                            <i class="fa-solid fa-id-card me-1"></i> Student Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/recommendations' else '' }}" href="/recommendations">
+                            <i class="fa-solid fa-bullseye me-1"></i> Recommendations
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/roadmap' else '' }}" href="/roadmap">
+                            <i class="fa-solid fa-route me-1"></i> Learning Roadmap
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/career-assistant' else '' }}" href="/career-assistant">
+                            <i class="fa-solid fa-comments me-1"></i> Career Assistant
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/dashboard' else '' }}" href="/dashboard">
+                            <i class="fa-solid fa-chart-pie me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ 'active' if request.path == '/methodology' else '' }}" href="/methodology">
+                            <i class="fa-solid fa-book-open me-1"></i> Methodology
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-dark border border-secondary text-secondary-emphasis d-none d-md-inline-block font-monospace" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-robot text-info me-1"></i> {{ llm_provider | upper }}: {{ llm_model }}
+                    </span>
+                    <a href="/profile" class="btn btn-primary btn-sm px-3 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Analyze Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-light border-top border-secondary-subtle pt-5 pb-4 mt-5">
+        <div class="container-fluid px-lg-5">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fa-solid fa-compass text-primary fs-4 me-2"></i>
+                        <span class="fw-bold fs-5 text-white">PathMatch AI</span>
+                    </div>
+                    <p class="text-secondary small mb-3">
+                        SIH25034 — Smart India Hackathon Innovation. Pure LLM-Powered Internship Role Recommendation and Career Guidance System.
+                    </p>
+                    <div class="alert alert-dark border-secondary-subtle small py-2 mb-0">
+                        <i class="fa-solid fa-circle-info text-info me-1"></i>
+                        <strong>Important Policy:</strong> PathMatch AI recommends <em>occupational role categories</em> based on O*NET standards. It does not display fictional live vacancies or employer listings.
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h6 class="text-white fw-semibold mb-3">Navigation</h6>
+                    <ul class="list-unstyled small space-y-2">
+                        <li class="mb-2"><a href="/" class="text-secondary text-decoration-none hover-white">Home</a></li>
+                        <li class="mb-2"><a href="/profile" class="text-secondary text-decoration-none hover-white">Profile Evaluation</a></li>
+                        <li class="mb-2"><a href="/recommendations" class="text-secondary text-decoration-none hover-white">Role Matches</a></li>
+                        <li class="mb-2"><a href="/roadmap" class="text-secondary text-decoration-none hover-white">Learning Roadmap</a></li>
+                        <li class="mb-2"><a href="/career-assistant" class="text-secondary text-decoration-none hover-white">AI Career Assistant</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-semibold mb-3">Multi-Agent System</h6>
+                    <ul class="list-unstyled small text-secondary">
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>Student Profile Agent</li>
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>Skill Intelligence Agent</li>
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>Occupational Retrieval Agent</li>
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>LLM Role Evaluation Agent</li>
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>Skill Gap Analysis Agent</li>
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>Learning Roadmap Agent</li>
+                        <li class="mb-1"><i class="fa-solid fa-check text-primary me-2"></i>Conversational Assistant</li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h6 class="text-white fw-semibold mb-3">Occupational Standards</h6>
+                    <p class="text-secondary small mb-2">
+                        Powered by official U.S. DOL O*NET 2018 SOC taxonomy reference data.
+                    </p>
+                    <div class="d-flex align-items-center gap-2 mt-3">
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis">Zero Traditional ML</span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis">Pure LLM Reasoning</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary-subtle my-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary">
+                <div>&copy; 2025-2026 PathMatch AI. Built for Smart India Hackathon (SIH25034).</div>
+                <div class="mt-2 mt-md-0 font-monospace">
+                    Provider: <span class="text-primary">{{ llm_provider }}</span> | Model: <span class="text-info">{{ llm_model }}</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
+

@@ -1,0 +1,20 @@
+# PathMatch AI Dependencies (SIH25034)
+# Core Web Framework
+Flask>=3.0.0
+Werkzeug>=3.0.0
+Jinja2>=3.1.0
+
+# Data Management
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Database & Utilities (SQLite is in standard library)
+python-dotenv>=1.0.0
+
+# Testing
+pytest>=8.0.0
+
+# Optional SDKs for direct provider clients (Standard library urllib fallback included)
+# openai>=1.0.0
+# groq>=0.5.0
+

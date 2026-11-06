@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}System Dashboard & Analytics — PathMatch AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">System Analytics & History</h2>
+            <p class="text-muted mb-0">Overview of student evaluations, occupational coverage, and recommendation runs.</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-md-0">
+            <a href="/profile" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-plus me-1"></i> New Evaluation
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">TOTAL RUNS</div>
+                        <h2 class="fw-extrabold mb-0 mt-1">{{ total_runs }}</h2>
+                    </div>
+                    <div class="p-3 bg-primary-subtle text-primary rounded-3">
+                        <i class="fa-solid fa-bolt fa-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">O*NET OCCUPATIONS</div>
+                        <h2 class="fw-extrabold mb-0 mt-1">{{ total_occupations }}</h2>
+                    </div>
+                    <div class="p-3 bg-success-subtle text-success rounded-3">
+                        <i class="fa-solid fa-database fa-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small fw-semibold">STUDENT PROFILES</div>
+                        <h2 class="fw-extrabold mb-0 mt-1">{{ total_students }}</h2>
+                    </div>
+                    <div class="p-3 bg-info-subtle text-info rounded-3">
+                        <i class="fa-solid fa-users fa-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card p-4 border-0 shadow-sm bg-white h-100">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Occupational Domain Distribution</h5>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="domainChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card p-4 border-0 shadow-sm bg-white h-100">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-column text-success me-2"></i>Sample Suitability Score Distribution</h5>
+                <div style="height: 280px; position: relative;">
+                    <canvas id="scoreDistChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="card p-4 border-0 shadow-sm bg-white mb-5">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-secondary me-2"></i>Recent Recommendation Runs</h5>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small">
+                    <tr>
+                        <th>Run ID</th>
+                        <th>Student</th>
+                        <th>Top Recommended Roles</th>
+                        <th>Provider</th>
+                        <th>Mode</th>
+                        <th>Timestamp</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    {% for run in runs %}
+                    <tr>
+                        <td class="font-monospace fw-semibold">#{{ run.id }}</td>
+                        <td>
+                            <strong>{{ run.student_name }}</strong>
+                        </td>
+                        <td>
+                            {% for rec in run.top_recommendations %}
+                            <span class="badge bg-light text-dark border me-1">{{ rec.occupation_title }} ({{ rec.match_score }})</span>
+                            {% endfor %}
+                        </td>
+                        <td><span class="badge bg-secondary-subtle text-secondary-emphasis">{{ run.model_provider }}</span></td>
+                        <td>
+                            {% if run.is_demo_mode %}
+                            <span class="badge bg-warning-subtle text-warning-emphasis">DEMO</span>
+                            {% else %}
+                            <span class="badge bg-success-subtle text-success">API</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted font-monospace" style="font-size: 0.75rem;">{{ run.run_timestamp }}</td>
+                        <td class="text-end">
+                            <a href="/recommendations?run_id={{ run.id }}" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem;">
+                                Results
+                            </a>
+                            <a href="/roadmap?run_id={{ run.id }}" class="btn btn-sm btn-outline-secondary py-0 px-2 ms-1" style="font-size: 0.8rem;">
+                                Roadmap
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No recommendation runs recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{{ url_static('js/dashboard.js') if url_static is defined else '/static/js/dashboard.js' }}"></script>
+{% endblock %}
+

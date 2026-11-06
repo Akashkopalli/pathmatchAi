@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Student Profile Builder — PathMatch AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Student Profile & Skills Assessment</h2>
+            <p class="text-muted mb-0">Follow the 3 simple steps below to discover your best matching internship roles.</p>
+        </div>
+        <div class="d-flex gap-2 mt-2 mt-md-0">
+            <button class="btn btn-outline-danger btn-sm" onclick="resetForm()">
+                <i class="fa-solid fa-rotate-left me-1"></i> Reset Form
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick 1-Click Sample Student Selection Bar -->
+    <div class="card p-3 border-0 shadow-sm bg-white mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary-subtle text-primary p-2 rounded-3">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                </span>
+                <div>
+                    <strong class="d-block small text-dark">Quick Test: Select a Sample Student</strong>
+                    <span class="text-muted" style="font-size: 0.78rem;">Click any name to immediately auto-fill their skills & projects:</span>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="loadSampleProfile('Rahul')">
+                    <i class="fa-solid fa-user-check me-1"></i> Rahul (Data)
+                </button>
+                <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="loadSampleProfile('Ananya')">
+                    <i class="fa-solid fa-user-check me-1"></i> Ananya (Web & UI)
+                </button>
+                <button type="button" class="btn btn-outline-info btn-sm rounded-pill px-3 text-dark" onclick="loadSampleProfile('Mohit')">
+                    <i class="fa-solid fa-user-check me-1"></i> Mohit (Backend)
+                </button>
+                <button type="button" class="btn btn-outline-warning btn-sm rounded-pill px-3 text-dark" onclick="loadSampleProfile('Sneha')">
+                    <i class="fa-solid fa-user-check me-1"></i> Sneha (AI & ML)
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="loadSampleProfile('Arjun')">
+                    <i class="fa-solid fa-user-check me-1"></i> Arjun (Security)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Step 1: Natural Language Profile Input -->
+        <div class="col-lg-6">
+            <div class="card p-4 h-100 border-0 shadow-sm bg-white">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="step-badge step-active me-2">1</div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Describe Yourself in Plain English</h5>
+                        <small class="text-muted">Agent 1 extracts and validates your skills automatically</small>
+                    </div>
+                </div>
+
+                <!-- Example Chips for Beginners -->
+                <div class="mb-3">
+                    <div class="small text-muted fw-semibold mb-2">Need an idea? Click an example narrative:</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        <button type="button" class="btn btn-light btn-sm border text-secondary" style="font-size: 0.78rem;" onclick="insertSampleText('web')">
+                            💡 Web Development
+                        </button>
+                        <button type="button" class="btn btn-light btn-sm border text-secondary" style="font-size: 0.78rem;" onclick="insertSampleText('data')">
+                            💡 Data Analytics
+                        </button>
+                        <button type="button" class="btn btn-light btn-sm border text-secondary" style="font-size: 0.78rem;" onclick="insertSampleText('ai')">
+                            💡 Machine Learning & AI
+                        </button>
+                        <button type="button" class="btn btn-light btn-sm border text-secondary" style="font-size: 0.78rem;" onclick="insertSampleText('backend')">
+                            💡 Java & Backend
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="naturalInput" class="form-label fw-semibold small text-dark">Tell us about your degree, skills, and any projects:</label>
+                    <textarea class="form-control font-monospace small" id="naturalInput" rows="8" placeholder="Example: I am a 3rd year Computer Science student skilled in Python, SQL, and Machine Learning. I developed a sentiment analysis classifier using Scikit-learn and Pandas. I am interested in AI and Data Science internship roles..."></textarea>
+                </div>
+
+                <div class="mt-auto">
+                    <button type="button" class="btn btn-primary w-100 py-2 shadow-sm" id="btnAnalyzeText" onclick="analyzeNaturalProfile()">
+                        <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Extract Profile with LLM &rarr;
+                    </button>
+                    <div class="text-muted small text-center mt-2" style="font-size: 0.75rem;">
+                        <i class="fa-solid fa-lock text-success me-1"></i> Your input is sanitized and processed securely by LLM reasoning.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Review and Run Recommendation -->
+        <div class="col-lg-6">
+            <div class="card p-4 h-100 border-0 shadow-sm bg-white">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="step-badge step-active me-2" style="background: #10b981;">2</div>
+                    <div>
+                        <h5 class="fw-bold mb-0">Verified Student Record</h5>
+                        <small class="text-muted">Review your skills and run the recommendation engine</small>
+                    </div>
+                </div>
+
+                <form id="profileForm">
+                    <input type="hidden" id="studentId" value="">
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Your Name</label>
+                            <input type="text" class="form-control form-control-sm" id="studentName" placeholder="e.g. Rahul Sharma" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Degree Program</label>
+                            <input type="text" class="form-control form-control-sm" id="degree" placeholder="e.g. B.Tech Computer Science" value="Computer Science">
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Specialization</label>
+                            <input type="text" class="form-control form-control-sm" id="specialization" placeholder="e.g. Data Analytics / Web Systems">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Education Level</label>
+                            <select class="form-select form-select-sm" id="educationLevel">
+                                <option value="Undergraduate (1st/2nd Year)">Undergraduate (1st/2nd Year)</option>
+                                <option value="Undergraduate (3rd Year)" selected>Undergraduate (3rd Year)</option>
+                                <option value="Undergraduate (Final Year)">Undergraduate (Final Year)</option>
+                                <option value="Postgraduate / Master's">Postgraduate / Master's</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Skills Tags Container -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold d-flex justify-content-between align-items-center">
+                            <span>Confirmed Technical Skills</span>
+                            <span class="text-muted" style="font-size: 0.75rem;">Type and press Enter to add</span>
+                        </label>
+                        <div class="input-group input-group-sm mb-2">
+                            <input type="text" class="form-control" id="newSkillInput" placeholder="Add skill (e.g. React, Python, Docker)" onkeydown="if(event.key==='Enter'){event.preventDefault(); addSkillTag();}">
+                            <button class="btn btn-outline-secondary" type="button" onclick="addSkillTag()">Add</button>
+                        </div>
+                        <div id="skillsContainer" class="p-2 border rounded bg-light min-h-50">
+                            <!-- Injected skill badges -->
+                        </div>
+                    </div>
+
+                    <!-- Projects Summary -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Projects Completed (Optional)</label>
+                        <textarea class="form-control form-control-sm font-monospace" id="projectsInput" rows="2" placeholder='[{"name": "E-Commerce App", "technologies": ["React", "Node.js"]}]'></textarea>
+                    </div>
+
+                    <!-- Interests & Goals -->
+                    <div class="row g-2 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Career Interests</label>
+                            <input type="text" class="form-control form-control-sm" id="interestsInput" placeholder="e.g. Web Development, UI Design">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Career Goals</label>
+                            <input type="text" class="form-control form-control-sm" id="goalsInput" placeholder="e.g. Frontend Engineer">
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Action Button -->
+                    <button type="button" class="btn btn-success btn-lg w-100 py-3 shadow" id="btnRunRecommendation" onclick="submitRecommendationPipeline()">
+                        <i class="fa-solid fa-bolt me-2"></i> Step 3: Run LLM Recommendation Pipeline
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg p-4 text-center position-relative">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" onclick="hideLoading()"></button>
+                <div class="mb-3">
+                    <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <h5 class="fw-bold mb-2" id="loadingTitle">LLM Agent Pipeline Executing...</h5>
+                <p class="text-muted small mb-0" id="loadingSubtext">
+                    Multi-agent reasoning in progress: Profile understanding &bull; Skill Intelligence &bull; O*NET Retrieval &bull; Comparative Role Suitability Evaluation
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_static('js/main.js') if url_static is defined else '/static/js/main.js' }}"></script>
+<script>
+function insertSampleText(type) {
+    const textEl = document.getElementById("naturalInput");
+    if (!textEl) return;
+
+    if (type === 'web') {
+        textEl.value = "I am a 3rd year Computer Science student skilled in HTML, CSS, JavaScript, React, and Figma. I built a responsive e-commerce shopping cart and designed prototypes in Figma. I want an internship in Frontend Web Development or UI Design.";
+    } else if (type === 'data') {
+        textEl.value = "I study Computer Science and have strong skills in Python, SQL, Excel, and Data Visualization. I built a sales performance dashboard analyzing multi-region revenue metrics. I am interested in Data Analytics and Business Intelligence internship roles.";
+    } else if (type === 'ai') {
+        textEl.value = "I am an AI / Computer Science undergraduate with hands-on skills in Python, Machine Learning, Scikit-learn, Pandas, and NumPy. I created a predictive customer churn classifier with cross-validation. My goal is to work as a Machine Learning Engineer or Data Scientist.";
+    } else if (type === 'backend') {
+        textEl.value = "I am a final year student skilled in Java, OOP principles, MySQL, Spring Boot, and REST API development. I designed a student attendance microservice connected to a relational database. I am targeting Backend Software Engineer internships.";
+    }
+}
+
+function resetForm() {
+    document.getElementById("profileForm").reset();
+    document.getElementById("naturalInput").value = "";
+    document.getElementById("studentId").value = "";
+    studentSkills = [];
+    renderSkills();
+}
+</script>
+{% endblock %}

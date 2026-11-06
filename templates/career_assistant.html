@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Conversational Career Assistant — PathMatch AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Conversational Career Assistant</h2>
+            <p class="text-muted mb-0">Agent 7: Context-aware internship and career guidance mentor.</p>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+            <label class="small text-muted fw-semibold">Active Student:</label>
+            <select class="form-select form-select-sm" id="activeStudentSelect" style="width: 200px;" onchange="switchChatStudent()">
+                {% for st in students %}
+                <option value="{{ st.id }}" {% if request.args.get('student_id')|int == st.id %}selected{% endif %}>
+                    {{ st.name }} ({{ st.degree }})
+                </option>
+                {% else %}
+                <option value="">No registered students</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Chat Area -->
+        <div class="col-lg-8">
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <!-- Chat Log -->
+                <div class="chat-container mb-3" id="chatContainer">
+                    <div class="chat-bubble chat-assistant">
+                        <div class="fw-semibold text-primary mb-1"><i class="fa-solid fa-robot me-1"></i> PathMatch Career Assistant</div>
+                        Hello! I am your AI career mentor. I have access to your academic background, confirmed technical skills, and latest O*NET role recommendations. How can I help with your internship preparation today?
+                    </div>
+                </div>
+
+            <!-- Quick Prompts -->
+            <div class="mb-3">
+                <div class="small fw-semibold text-muted mb-2">Try asking anything or click a suggestion:</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="sendQuickPrompt('How should I prepare for technical internship interviews?')">
+                        <i class="fa-solid fa-code me-1"></i> Technical Interviews
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="sendQuickPrompt('How do I build a resume that gets noticed by recruiters?')">
+                        <i class="fa-solid fa-file-invoice me-1"></i> Resume Tips
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="sendQuickPrompt('What is Docker and how do I learn it?')">
+                        <i class="fa-solid fa-box me-1"></i> Why Docker?
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="sendQuickPrompt('Which portfolio project should I build next for my profile?')">
+                        <i class="fa-solid fa-laptop-code me-1"></i> Project Ideas
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="sendQuickPrompt('How do I find off-campus internships on LinkedIn?')">
+                        <i class="fa-solid fa-briefcase me-1"></i> Finding Internships
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill ms-auto" onclick="clearChat()">
+                        <i class="fa-solid fa-trash-can me-1"></i> Clear Chat
+                    </button>
+                </div>
+            </div>
+
+                <!-- Input Field -->
+                <form id="chatForm" onsubmit="event.preventDefault(); sendChatMessage();">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="chatInput" placeholder="Ask career question (e.g. How can I transition into an AI internship role?)..." autocomplete="off" required>
+                        <button class="btn btn-primary px-4" type="submit" id="btnSendChat">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Send
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Assistant Sidebar Guidance -->
+        <div class="col-lg-4">
+            <div class="card p-4 border-0 shadow-sm bg-white mb-4">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-lightbulb text-warning me-2"></i>Guidance Scope</h5>
+                <ul class="list-unstyled small text-secondary mb-0">
+                    <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Evaluates role suitability using your project evidence</li>
+                    <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Explains O*NET occupational standards</li>
+                    <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Pinpoints high-priority tools to learn</li>
+                    <li class="mb-2"><i class="fa-solid fa-check text-success me-2"></i>Suggests realistic portfolio capstones</li>
+                </ul>
+            </div>
+
+            <div class="card p-4 border-0 shadow-sm bg-white">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fa-solid fa-shield-check text-primary me-2"></i>
+                    <h6 class="fw-bold mb-0">Responsible AI Policy</h6>
+                </div>
+                <p class="small text-muted mb-0">
+                    PathMatch AI advises on occupational categories and preparation strategies. It does not fabricate corporate job postings or guaranteed offers.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentSessionId = null;
+
+function formatMarkdown(text) {
+    if (!text) return "";
+    let formatted = text
+        // Escape HTML
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        // Bold **text**
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        // Italics *text*
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        // Bullet points
+        .replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>")
+        // Line breaks
+        .replace(/\n\n/g, "<br><br>")
+        .replace(/\n/g, "<br>");
+    return formatted;
+}
+
+function sendQuickPrompt(promptText) {
+    document.getElementById('chatInput').value = promptText;
+    sendChatMessage();
+}
+
+function clearChat() {
+    currentSessionId = null;
+    const container = document.getElementById('chatContainer');
+    container.innerHTML = `
+        <div class="chat-bubble chat-assistant">
+            <div class="fw-semibold text-primary mb-1"><i class="fa-solid fa-robot me-1"></i> PathMatch Career Assistant</div>
+            Conversation reset. I am ready for your questions! Ask about interview preparation, specific technologies, resume tips, or role roadmaps.
+        </div>
+    `;
+}
+
+function switchChatStudent() {
+    const studentId = document.getElementById('activeStudentSelect').value;
+    if (studentId) {
+        window.location.href = `/career-assistant?student_id=${studentId}`;
+    }
+}
+
+async function sendChatMessage() {
+    const inputEl = document.getElementById('chatInput');
+    const msg = inputEl.value.trim();
+    if (!msg) return;
+
+    const studentId = document.getElementById('activeStudentSelect').value;
+    const container = document.getElementById('chatContainer');
+    const btnSend = document.getElementById('btnSendChat');
+
+    // Append user message bubble
+    const userDiv = document.createElement('div');
+    userDiv.className = 'chat-bubble chat-user';
+    userDiv.textContent = msg;
+    container.appendChild(userDiv);
+
+    inputEl.value = '';
+    btnSend.disabled = true;
+
+    // Append typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'chat-bubble chat-assistant text-muted fst-italic';
+    typingDiv.id = 'typingIndicator';
+    typingDiv.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2" role="status"></span>Assistant is thinking...';
+    container.appendChild(typingDiv);
+    container.scrollTop = container.scrollHeight;
+
+    try {
+        const resp = await fetch('/api/career-chat', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                message: msg,
+                student_id: studentId ? parseInt(studentId) : null,
+                session_id: currentSessionId
+            })
+        });
+
+        const data = await resp.json();
+        const typingEl = document.getElementById('typingIndicator');
+        if (typingEl) typingEl.remove();
+
+        if (resp.ok && data.status === 'success') {
+            currentSessionId = data.session_id;
+
+            const assistantDiv = document.createElement('div');
+            assistantDiv.className = 'chat-bubble chat-assistant';
+            assistantDiv.innerHTML = `
+                <div class="fw-semibold text-primary mb-1"><i class="fa-solid fa-robot me-1"></i> PathMatch Career Assistant</div>
+                <div>${formatMarkdown(data.reply)}</div>
+            `;
+            container.appendChild(assistantDiv);
+        } else {
+            const errDiv = document.createElement('div');
+            errDiv.className = 'chat-bubble chat-assistant text-danger';
+            errDiv.textContent = data.error || 'Failed to receive assistant reply.';
+            container.appendChild(errDiv);
+        }
+    } catch (e) {
+        const typingEl = document.getElementById('typingIndicator');
+        if (typingEl) typingEl.remove();
+
+        const errDiv = document.createElement('div');
+        errDiv.className = 'chat-bubble chat-assistant text-danger';
+        errDiv.textContent = 'Connection error. Please try again.';
+        container.appendChild(errDiv);
+    } finally {
+        btnSend.disabled = false;
+        container.scrollTop = container.scrollHeight;
+    }
+}
+
+// Auto-populate URL query prompt if passed
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const promptParam = urlParams.get('prompt');
+    if (promptParam) {
+        sendQuickPrompt(promptParam);
+    }
+});
+</script>
+{% endblock %}
+

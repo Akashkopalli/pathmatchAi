@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}PathMatch AI — Find Your Ideal Internship Role & Career Roadmap{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-5">
+    <!-- Hero Banner -->
+    <div class="hero-gradient p-4 p-md-5 mb-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div
+                    class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill bg-primary bg-opacity-25 border border-primary border-opacity-50 text-white small">
+                    <i class="fa-solid fa-sparkles text-warning"></i>
+                    <span>SIH25034 — Smart India Hackathon Innovation</span>
+                </div>
+                <h1 class="display-5 fw-extrabold text-white mb-3 tracking-tight">
+                    Find Your Ideal Tech Internship Role in Seconds
+                </h1>
+                <p class="lead text-light text-opacity-80 mb-4 fs-6">
+                    Not sure where your coding skills fit best? PathMatch AI compares your projects and technical skills
+                    against <strong>70+ official O*NET occupational standards</strong>, reveals your skill gaps, and
+                    creates a tailored 90-day learning roadmap.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="/profile" class="btn btn-primary btn-lg px-4 shadow">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Find My Best Roles
+                    </a>
+                    <a href="/methodology" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fa-solid fa-circle-question me-2"></i> How It Works
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <div
+                    class="p-4 bg-white bg-opacity-10 rounded-4 border border-white border-opacity-20 shadow-lg text-start backdrop-blur">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <span class="badge bg-success"><i class="fa-solid fa-shield-check me-1"></i> Verified O*NET
+                            Taxonomy</span>
+                        <span class="badge bg-light text-dark font-monospace" style="font-size: 0.7rem;">Zero Fake
+                            Openings</span>
+                    </div>
+                    <h6 class="text-white fw-bold mb-3">What You Will Get:</h6>
+                    <div class="d-flex align-items-start gap-3 mb-2 text-light text-opacity-90 small">
+                        <i class="fa-solid fa-bullseye text-warning fs-5 mt-1"></i>
+                        <div><strong>Top Ranked Roles:</strong> Discover your best role categories (e.g. Data Scientist,
+                            Frontend Developer, DevOps).</div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3 mb-2 text-light text-opacity-90 small">
+                        <i class="fa-solid fa-list-check text-info fs-5 mt-1"></i>
+                        <div><strong>Skill Gap Audit:</strong> See exact tools you are missing to become
+                            internship-ready.</div>
+                    </div>
+                    <div class="d-flex align-items-start gap-3 text-light text-opacity-90 small">
+                        <i class="fa-solid fa-route text-success fs-5 mt-1"></i>
+                        <div><strong>30-60-90 Day Roadmap:</strong> Step-by-step milestones, exercises, and
+                            mini-projects.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3-Step Simple Guide for Basic Users -->
+    <div class="text-center mb-5">
+        <span
+            class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill small text-uppercase fw-bold">Simple
+            3-Step Process</span>
+        <h2 class="fw-bold mt-2 mb-2">How PathMatch AI Works for You</h2>
+        <p class="text-muted mx-auto" style="max-width: 600px;">No complicated jargon. Just tell us what you know, and
+            our multi-agent AI guides you step by step.</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm bg-white text-center">
+                <div class="mx-auto mb-3">
+                    <div class="step-badge step-active fs-5" style="width: 52px; height: 52px;">1</div>
+                </div>
+                <h5 class="fw-bold mb-2">Enter Your Skills or Projects</h5>
+                <p class="text-muted small mb-0">
+                    Type in plain English, paste your resume summary, or pick one of our 5 pre-made student profiles
+                    with 1 click.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm bg-white text-center">
+                <div class="mx-auto mb-3">
+                    <div class="step-badge step-active fs-5" style="width: 52px; height: 52px; background: #8b5cf6;">2
+                    </div>
+                </div>
+                <h5 class="fw-bold mb-2">AI Analyzes 70+ Career Roles</h5>
+                <p class="text-muted small mb-0">
+                    Our AI compares your confirmed competencies against real occupational requirements and scores your
+                    suitability (0–100).
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0 shadow-sm bg-white text-center">
+                <div class="mx-auto mb-3">
+                    <div class="step-badge step-active fs-5" style="width: 52px; height: 52px; background: #10b981;">3
+                    </div>
+                </div>
+                <h5 class="fw-bold mb-2">Get Roadmap & Mentorship</h5>
+                <p class="text-muted small mb-0">
+                    Follow your custom 30, 60, and 90-day learning plan, and ask our Conversational Career Assistant any
+                    questions.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1-Click Sample Student Try-Out Cards -->
+    <div class="card p-4 p-md-5 border-0 shadow-sm bg-white mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Try It Instantly With Pre-Built Student Profiles</h3>
+                <p class="text-muted small mb-0">Click any student below to see how PathMatch matches their skills to
+                    internship roles.</p>
+            </div>
+            <a href="/profile" class="btn btn-outline-primary btn-sm mt-2 mt-md-0">
+                <i class="fa-solid fa-pen-to-square me-1"></i> Custom Profile Builder
+            </a>
+        </div>
+
+        <div class="row g-3">
+            <!-- Rahul -->
+            <div class="col-lg col-md-6">
+                <div class="card h-100 p-3 border card-interactive bg-light"
+                    onclick="window.location.href='/profile?sample=Rahul'">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="student-avatar bg-primary text-white">R</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Rahul</h6>
+                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.7rem;">Data
+                                Analytics</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">Python, SQL, Excel, Statistics & Business Insights</p>
+                    <div class="mt-auto">
+                        <span class="btn btn-sm btn-primary w-100">Try Rahul's Profile &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ananya -->
+            <div class="col-lg col-md-6">
+                <div class="card h-100 p-3 border card-interactive bg-light"
+                    onclick="window.location.href='/profile?sample=Ananya'">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="student-avatar bg-success text-white">A</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Ananya</h6>
+                            <span class="badge bg-success-subtle text-success" style="font-size: 0.7rem;">Web & UI
+                                Design</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">HTML, CSS, JavaScript, React, Figma, Git</p>
+                    <div class="mt-auto">
+                        <span class="btn btn-sm btn-success w-100">Try Ananya's Profile &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mohit -->
+            <div class="col-lg col-md-6">
+                <div class="card h-100 p-3 border card-interactive bg-light"
+                    onclick="window.location.href='/profile?sample=Mohit'">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="student-avatar bg-info text-white">M</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Mohit</h6>
+                            <span class="badge bg-info-subtle text-info" style="font-size: 0.7rem;">Backend
+                                Systems</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">Java, OOP, MySQL, Spring Boot, REST APIs</p>
+                    <div class="mt-auto">
+                        <span class="btn btn-sm btn-info text-white w-100">Try Mohit's Profile &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sneha -->
+            <div class="col-lg col-md-6">
+                <div class="card h-100 p-3 border card-interactive bg-light"
+                    onclick="window.location.href='/profile?sample=Sneha'">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="student-avatar bg-warning text-dark">S</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Sneha</h6>
+                            <span class="badge bg-warning-subtle text-warning-emphasis" style="font-size: 0.7rem;">AI &
+                                Data Science</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">Python, Machine Learning, Pandas, Scikit-learn</p>
+                    <div class="mt-auto">
+                        <span class="btn btn-sm btn-warning w-100">Try Sneha's Profile &rarr;</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arjun -->
+            <div class="col-lg col-md-6">
+                <div class="card h-100 p-3 border card-interactive bg-light"
+                    onclick="window.location.href='/profile?sample=Arjun'">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="student-avatar bg-danger text-white">A</div>
+                        <div>
+                            <h6 class="fw-bold mb-0">Arjun</h6>
+                            <span class="badge bg-danger-subtle text-danger"
+                                style="font-size: 0.7rem;">Cybersecurity</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3">C, C++, Computer Networks, Linux, Wireshark</p>
+                    <div class="mt-auto">
+                        <span class="btn btn-sm btn-danger w-100">Try Arjun's Profile &rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
