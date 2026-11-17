@@ -26,11 +26,18 @@ def get_recommendations():
     data = request.get_json(silent=True) or {}
     student_id = data.get("student_id")
 
-    profile_data = data
-    if student_id:
+    # If fresh skills or natural input were submitted in payload, update or save as source of truth
+    if data.get("skills") is not None or data.get("natural_input"):
+        if student_id:
+            data["id"] = student_id
+        student_id = ProfileService.save_or_update_student(data)
         student = ProfileService.get_student_by_id(student_id)
-        if student:
-            profile_data = student.to_dict()
+        profile_data = student.to_dict() if student else data
+    elif student_id:
+        student = ProfileService.get_student_by_id(student_id)
+        profile_data = student.to_dict() if student else data
+    else:
+        profile_data = data
 
     top_k = int(data.get("top_k", 6))
 

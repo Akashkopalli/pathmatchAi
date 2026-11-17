@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 56" width="280" height="56" fill="none">
+  <defs>
+    <linearGradient id="lightBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="lightPrimaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="lightGlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#9333ea"/>
+    </linearGradient>
+    <linearGradient id="lightBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Icon Mark -->
+  <g transform="translate(4, 4)">
+    <rect width="48" height="48" rx="12" fill="url(#lightBgGrad)"/>
+    <rect width="48" height="48" rx="12" stroke="url(#lightPrimaryGrad)" stroke-width="1.2" stroke-opacity="0.3"/>
+    <path d="M12 35C12 29 16 26 22 26H27C32 26 35 23 35 17" 
+          stroke="url(#lightPrimaryGrad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M20 35C20 29 24 23 32 17L35 14" 
+          stroke="url(#lightGlowGrad)" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M29 14H35V20" 
+          stroke="url(#lightPrimaryGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="35" r="2.8" fill="#0284c7"/>
+    <circle cx="25" cy="26" r="2.4" fill="#2563eb"/>
+    <circle cx="35" cy="14" r="2" fill="#7c3aed"/>
+    <path d="M35 30L36 33L39 34L36 35L35 38L34 35L31 34L34 33Z" 
+          fill="#0284c7" opacity="0.85"/>
+  </g>
+
+  <!-- Typography: PathMatch AI -->
+  <text x="64" y="32" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="800" fill="#0f172a" letter-spacing="-0.5">
+    Path<tspan fill="#2563eb">Match</tspan>
+  </text>
+
+  <!-- AI Badge -->
+  <rect x="188" y="16" width="32" height="18" rx="5" fill="url(#lightBadgeGrad)"/>
+  <text x="204" y="29" font-family="'JetBrains Mono', monospace, sans-serif" font-size="10.5" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">AI</text>
+
+  <!-- Subtitle -->
+  <text x="65" y="44" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-size="8.5" font-weight="600" fill="#64748b" letter-spacing="2">
+    CAREER INTELLIGENCE
+  </text>
+</svg>

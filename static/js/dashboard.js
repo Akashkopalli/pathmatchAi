@@ -8,6 +8,40 @@
 let allOccupations = [];
 let activeDomain = "ALL";
 let occModalInstance = null;
+let chartSkillsInstance = null;
+let chartDomainInstance = null;
+let chartTechInstance = null;
+let chartScoreInstance = null;
+
+function getChartThemeColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+        text: isDark ? '#94a3b8' : '#64748b',
+        grid: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
+    };
+}
+
+window.addEventListener('themeChanged', function() {
+    const colors = getChartThemeColors();
+    [chartSkillsInstance, chartTechInstance, chartScoreInstance].forEach(chart => {
+        if (chart && chart.options && chart.options.scales) {
+            if (chart.options.scales.x) {
+                if (chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = colors.text;
+                if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = colors.grid;
+                if (chart.options.scales.x.title) chart.options.scales.x.title.color = colors.text;
+            }
+            if (chart.options.scales.y) {
+                if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = colors.text;
+                if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = colors.grid;
+            }
+            chart.update();
+        }
+    });
+    if (chartDomainInstance && chartDomainInstance.options && chartDomainInstance.options.plugins && chartDomainInstance.options.plugins.legend) {
+        chartDomainInstance.options.plugins.legend.labels.color = colors.text;
+        chartDomainInstance.update();
+    }
+});
 
 document.addEventListener("DOMContentLoaded", async function () {
     // Initialize Modal instance
@@ -81,7 +115,9 @@ function initSkillsChart(skillsData) {
         dataCounts = skillsData.map(item => item.count);
     }
 
-    new Chart(ctx, {
+    const colors = getChartThemeColors();
+    if (chartSkillsInstance) chartSkillsInstance.destroy();
+    chartSkillsInstance = new Chart(ctx, {
         type: "bar",
         data: {
             labels: labels,
@@ -146,7 +182,9 @@ function initDomainChart(domainData) {
         dataCounts = domainData.map(d => d.count);
     }
 
-    new Chart(ctx, {
+    const colors = getChartThemeColors();
+    if (chartDomainInstance) chartDomainInstance.destroy();
+    chartDomainInstance = new Chart(ctx, {
         type: "doughnut",
         data: {
             labels: labels,
@@ -210,7 +248,9 @@ function initTechChart(techData) {
         dataCounts = techData.map(item => item.count);
     }
 
-    new Chart(ctx, {
+    const colors = getChartThemeColors();
+    if (chartTechInstance) chartTechInstance.destroy();
+    chartTechInstance = new Chart(ctx, {
         type: "bar",
         data: {
             labels: labels,
@@ -260,7 +300,9 @@ function initScoreDistChart(scoreData) {
         dataCounts = labels.map(l => countsMap[l] || 0);
     }
 
-    new Chart(ctx, {
+    const colors = getChartThemeColors();
+    if (chartScoreInstance) chartScoreInstance.destroy();
+    chartScoreInstance = new Chart(ctx, {
         type: "bar",
         data: {
             labels: labels,
@@ -423,10 +465,13 @@ function renderOccupationsTable(occupations) {
                 <td>
                     <div class="d-flex flex-wrap">${techBadges || '<span class="text-muted small">—</span>'}</div>
                 </td>
-                <td class="text-end">
+                <td class="text-end text-nowrap">
                     <button class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.8rem;" onclick="inspectOccupation('${escapeHtml(occ.soc_code)}')">
                         <i class="fa-solid fa-eye me-1"></i> Specs
                     </button>
+                    <a href="https://www.onetonline.org/link/summary/${encodeURIComponent(occ.soc_code)}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success py-0 px-2 ms-1" style="font-size: 0.8rem;" title="Open ${escapeHtml(occ.title)} on official O*NET Online">
+                        <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> O*NET
+                    </a>
                 </td>
             </tr>
         `;
@@ -480,6 +525,13 @@ function inspectOccupation(socCode) {
     const profileLink = document.getElementById("modalProfileLink");
     if (profileLink) {
         profileLink.href = `/profile?goal=${encodeURIComponent(occ.title)}`;
+    }
+
+    // Update official O*NET platform external link
+    const onetPlatformLink = document.getElementById("modalOnetPlatformLink");
+    if (onetPlatformLink) {
+        onetPlatformLink.href = `https://www.onetonline.org/link/summary/${encodeURIComponent(occ.soc_code)}`;
+        onetPlatformLink.title = `Open ${occ.title} on official O*NET Online`;
     }
 
     if (occModalInstance) {

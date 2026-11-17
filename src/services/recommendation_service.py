@@ -81,9 +81,8 @@ class RecommendationService:
             total_completion_tokens += prof_resp.completion_tokens
             profile_data = structured_profile
 
-        # Ensure student is persisted
-        if not student_id:
-            student_id = ProfileService.save_or_update_student(profile_data)
+        # Ensure student is persisted with up-to-date profile data
+        student_id = ProfileService.save_or_update_student(profile_data)
         profile_data["id"] = student_id
 
         # Step 2: Skill Intelligence

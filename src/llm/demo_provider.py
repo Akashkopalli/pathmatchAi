@@ -68,6 +68,7 @@ class DemoProvider(BaseLLMProvider):
         """Simulate Profile Understanding Agent extracting skills and projects."""
         text = user_prompt.lower()
         detected_skills = []
+        # Known skill catalog with word boundary checking
         known_skill_keywords = [
             ("python", "Python"), ("sql", "SQL"), ("excel", "Excel"),
             ("statistics", "Statistics"), ("data visualization", "Data Visualization"),
@@ -77,12 +78,13 @@ class DemoProvider(BaseLLMProvider):
             ("react", "React"), ("figma", "Figma"), ("git", "Git"),
             ("java", "Java"), ("oop", "OOP"), ("mysql", "MySQL"),
             ("spring boot", "Spring Boot"), ("rest api", "REST API"),
-            ("c++", "C++"), ("c ", "C"), ("computer networks", "Computer Networks"),
+            ("c\\+\\+", "C++"), ("computer networks", "Computer Networks"),
             ("linux", "Linux"), ("wireshark", "Wireshark"), ("cybersecurity", "Cybersecurity Basics")
         ]
 
         for kw, canonical in known_skill_keywords:
-            if kw in text:
+            pattern = r"\b" + kw + r"\b"
+            if re.search(pattern, text):
                 detected_skills.append({
                     "name": canonical,
                     "evidence": "Explicitly provided",
@@ -134,115 +136,318 @@ class DemoProvider(BaseLLMProvider):
         return json.dumps(output, indent=2)
 
     def _simulate_skill_intelligence_agent(self, user_prompt: str) -> str:
-        """Simulate Skill Intelligence Agent classifying relationships."""
+        """Simulate Skill Intelligence Agent classifying relationships dynamically from user input."""
+        skills_match = re.search(r"Confirmed Student Skills:\s*([^\n\r]+)", user_prompt)
+        raw_skills = skills_match.group(1).strip() if skills_match else ""
+        skills_list = [s.strip() for s in raw_skills.split(",") if s.strip() and s.strip().lower() != "none explicitly listed"]
+        if not skills_list:
+            skills_list = ["Foundational Computing"]
+
+        s_lower = {s.lower() for s in skills_list}
+        related = []
+        transferable = ["Structured Problem Decomposition", "Technical Logic"]
+        skills_to_learn = []
+
+        if "html" in s_lower or "css" in s_lower:
+            related.extend(["Semantic HTML5", "Responsive Web Design (Flexbox/Grid)", "CSS Box Model", "Web Accessibility (WCAG)"])
+            transferable.extend(["Visual Layout Structuring", "Cross-Browser Compatibility"])
+            if "javascript" not in s_lower:
+                skills_to_learn.append("JavaScript (DOM Manipulation & ES6+)")
+            if "git" not in s_lower:
+                skills_to_learn.append("Git Version Control & GitHub")
+            if "react" not in s_lower and "vue" not in s_lower:
+                skills_to_learn.append("Frontend Frameworks (React or Vue)")
+
+        if "python" in s_lower:
+            related.extend(["Object-Oriented Python", "Scripting & Automation", "Virtual Environments"])
+            transferable.extend(["Data Processing", "Algorithmic Thinking"])
+            if "sql" not in s_lower:
+                skills_to_learn.append("SQL Database Querying")
+            if "docker" not in s_lower:
+                skills_to_learn.append("Docker Containerization")
+
+        if "java" in s_lower:
+            related.extend(["OOP Design Patterns", "JVM Architecture", "Exception Handling"])
+            transferable.extend(["Modular Software Design", "Transactional Architecture"])
+            if "spring boot" not in s_lower:
+                skills_to_learn.append("Spring Boot Framework")
+
+        if "sql" in s_lower:
+            related.extend(["Relational Schema Design", "Index Optimization", "Query Planning"])
+            transferable.extend(["Data Integrity Auditing", "Analytical Queries"])
+
+        if not skills_to_learn:
+            skills_to_learn = ["Production CI/CD Workflows", "Cloud Deployment (AWS/GCP)", "Automated Unit Testing"]
+
         output = {
-            "confirmed_skills": ["Python", "SQL", "Git"],
-            "related_skills": ["Database Design", "Version Control", "Scripting"],
-            "transferable_skills": ["Algorithmic Thinking", "Problem Decomposition", "Technical Documentation"],
+            "confirmed_skills": skills_list,
+            "related_skills": related or ["Core Programming Syntax", "Software Architecture"],
+            "transferable_skills": transferable,
             "skills_requiring_verification": ["Production Scalability", "System Architecture"],
-            "skills_to_learn": ["Cloud Deployment (Docker/AWS)", "CI/CD Workflows"],
-            "reasoning": "Explicit student skills validated against occupational standards without artificial capability exaggeration."
+            "skills_to_learn": skills_to_learn[:4],
+            "reasoning": f"Confirmed capabilities evaluated for {', '.join(skills_list)}. Evaluated strictly without artificial exaggeration."
         }
         return json.dumps(output, indent=2)
 
     def _simulate_recommendation_agent(self, user_prompt: str) -> str:
-        """Simulate LLM Evaluation Agent evaluating candidate occupations based on prompt context."""
-        # Check prompt for candidate occupations passed by retriever
-        recommendations = []
+        """Simulate LLM Evaluation Agent evaluating candidate occupations dynamically against student profile."""
+        # 1. Parse student profile from prompt
+        confirmed_skills = []
+        skills_match = re.search(r"Confirmed Skills:\s*([^\n\r]+)", user_prompt)
+        if skills_match:
+            raw_s = skills_match.group(1).strip()
+            if raw_s.lower() not in ["none explicitly listed", "none listed"]:
+                confirmed_skills = [s.strip() for s in raw_s.split(",") if s.strip()]
 
-        # Find candidate occupations listed in user_prompt
-        # Match pattern: SOC: (15-\d{4}\.\d{2}) | Title: ([^\n]+)
-        candidates = re.findall(r"SOC:\s*(\d{2}-\d{4}\.\d{2})\s*\|\s*Title:\s*([^\n\r]+)", user_prompt)
+        s_lower_set = {s.lower() for s in confirmed_skills}
 
-        # Isolate student profile part to avoid false matches against candidate descriptions
-        if "RETRIEVED CANDIDATE OCCUPATIONS:" in user_prompt:
-            p_lower = user_prompt.split("RETRIEVED CANDIDATE OCCUPATIONS:")[0].lower()
-        else:
-            p_lower = user_prompt.lower()
+        # Check projects
+        project_techs = set()
+        if "Portfolio Projects:" in user_prompt and "- Stated Interests:" in user_prompt:
+            try:
+                proj_part = user_prompt.split("Portfolio Projects:")[1].split("- Stated Interests:")[0].strip()
+                projects = json.loads(proj_part)
+                if isinstance(projects, list):
+                    for p in projects:
+                        if isinstance(p, dict):
+                            for t in p.get("technologies", []):
+                                project_techs.add(t.lower().strip())
+            except Exception:
+                pass
 
-        if candidates:
-            # Score each candidate thoughtfully based on student profile in prompt
-            for soc, title in candidates[:12]:
-                title_clean = title.strip()
-                t_low = title_clean.lower()
+        # Interests & goals
+        int_match = re.search(r"Stated Interests:\s*([^\n\r]+)", user_prompt)
+        interests_str = (int_match.group(1).lower() if int_match else "")
+        goal_match = re.search(r"Career Goals:\s*([^\n\r]+)", user_prompt)
+        goals_str = (goal_match.group(1).lower() if goal_match else "")
 
-                score = 55
-                matching = []
-                missing = ["Cloud Infrastructure", "System Architecture"]
-                proj_rel = "Relevant academic and hands-on portfolio implementation demonstrates foundational readiness."
-                interest_al = "Alignment with general technology principles."
+        # 2. Parse candidate occupations blocks from RETRIEVED CANDIDATE OCCUPATIONS
+        candidates = []
+        blocks = re.split(r"Candidate\s+\d+:\s*", user_prompt)[1:]
+        for b in blocks:
+            soc_m = re.search(r"SOC:\s*([^\s|]+)", b)
+            title_m = re.search(r"Title:\s*([^\n\r]+)", b)
+            dom_m = re.search(r"Domain:\s*([^\s|]+(?:\s+[^\s|]+)*)", b)
+            desc_m = re.search(r"Description:\s*([^\n\r]+)", b)
+            req_m = re.search(r"Required Skills:\s*([^\n\r]+)", b)
+            tech_m = re.search(r"Technology Skills:\s*([^\n\r]+)", b)
 
-                # Java / Backend Developer (e.g. Mohit)
-                if ("java" in p_lower or "spring" in p_lower or "backend" in p_lower) and ("backend" in t_low or "java" in t_low or "software developer" in t_low or "api" in t_low or "spring" in t_low):
-                    score = 91 if ("java" in t_low or "backend" in t_low or "spring" in t_low) else 82
-                    matching = ["Java", "OOP", "MySQL", "REST API", "Spring Boot"]
-                    missing = ["Docker / Containerization", "Kafka / Message Queues", "Microservice Security"]
-                    interest_al = "Matches interest in robust server-side architecture and transactional reliability."
-                # Frontend / Web Developer (e.g. Ananya)
-                elif ("react" in p_lower or "html" in p_lower or "frontend" in p_lower or "figma" in p_lower) and ("web" in t_low or "designer" in t_low or "frontend" in t_low or "mobile" in t_low or "vue" in t_low or "interface" in t_low):
-                    score = 92 if ("frontend" in t_low or "web" in t_low) else 83
-                    matching = ["HTML", "CSS", "JavaScript", "React", "Figma"]
-                    missing = ["TypeScript", "Next.js / SSR", "Web Accessibility (WCAG)"]
-                    interest_al = "Aligns seamlessly with student's passion for interactive user interfaces and visual aesthetics."
-                # Cybersecurity / Networking (e.g. Arjun)
-                elif ("cybersecurity" in p_lower or "wireshark" in p_lower or "network" in p_lower or "linux" in p_lower and "c++" in p_lower) and ("security" in t_low or "network" in t_low or "forensics" in t_low or "administrator" in t_low):
-                    score = 90 if ("security" in t_low or "network" in t_low) else 80
-                    matching = ["C", "C++", "Computer Networks", "Linux", "Cybersecurity Basics", "Wireshark"]
-                    missing = ["SIEM Tools (Splunk)", "Firewall Architecture", "Incident Triage Frameworks"]
-                    interest_al = "Directly mirrors the candidate's dedication to network defense and vulnerability analysis."
-                # Machine Learning / AI (e.g. Sneha)
-                elif ("machine learning" in p_lower or "scikit" in p_lower or "artificial intelligence" in p_lower) and ("machine learning" in t_low or "data scientist" in t_low or "ai" in t_low or "deep learning" in t_low or "vision" in t_low):
-                    score = 93 if ("machine learning" in t_low or "data scientist" in t_low) else 82
-                    matching = ["Python", "Machine Learning", "Pandas", "NumPy", "Scikit-learn"]
-                    missing = ["Deep Learning (PyTorch)", "MLOps & Model Monitoring", "Docker"]
-                    interest_al = "High synergy with student's aspiration to build predictive AI pipelines."
-                # Data Analytics / BI (e.g. Rahul)
-                elif ("data" in p_lower or "analytics" in p_lower or "excel" in p_lower or "visualization" in p_lower) and ("data" in t_low or "analyst" in t_low or "intelligence" in t_low or "statistician" in t_low or "database" in t_low):
-                    score = 89 if ("analyst" in t_low or "intelligence" in t_low or "scientist" in t_low) else 81
-                    matching = ["Python", "SQL", "Statistics", "Data Visualization"]
-                    missing = ["Tableau / Power BI Advanced Modeling", "Cloud Data Warehouses"]
-                    interest_al = "Directly matches analytical curiosity and data-driven problem solving interest."
-
-                recommendations.append({
-                    "occupation_title": title_clean,
-                    "soc_code": soc,
-                    "match_score": score,
-                    "matching_skills": matching or ["Programming Basics", "Problem Solving"],
-                    "missing_skills": missing,
-                    "project_relevance": proj_rel,
-                    "interest_alignment": interest_al,
-                    "reason": f"Demonstrates strong foundational alignment for {title_clean}. Core prerequisite competencies match student profile; recommended upskilling in missing domain tools.",
-                    "improvement_suggestions": [f"Undertake practical project covering {missing[0]}", f"Deepen knowledge in {missing[-1]}"],
-                    "confidence": "High" if score >= 85 else "Moderate"
+            if soc_m and title_m:
+                req_list = [s.strip() for s in req_m.group(1).split(",") if s.strip()] if req_m else []
+                tech_list = [s.strip() for s in tech_m.group(1).split(",") if s.strip()] if tech_m else []
+                candidates.append({
+                    "soc": soc_m.group(1).strip(),
+                    "title": title_m.group(1).strip(),
+                    "domain": dom_m.group(1).strip() if dom_m else "",
+                    "description": desc_m.group(1).strip() if desc_m else "",
+                    "required_skills": req_list,
+                    "technology_skills": tech_list
                 })
 
-        # Sort recommendations by match score
+        # Helper to check if student actually has a candidate skill
+        def normalize_skill(sk):
+            return re.sub(r"[^a-z0-9]", "", sk.lower())
+
+        def has_skill(cand_sk):
+            c_norm = normalize_skill(cand_sk)
+            for s in confirmed_skills:
+                s_norm = normalize_skill(s)
+                if s_norm == c_norm:
+                    return True
+                pairs = [
+                    ({"html", "html5"}),
+                    ({"css", "css3"}),
+                    ({"js", "javascript"}),
+                    ({"py", "python"}),
+                    ({"ts", "typescript"}),
+                ]
+                for p in pairs:
+                    if s_norm in p and c_norm in p:
+                        return True
+            return False
+
+        recommendations = []
+        for c in candidates:
+            title = c["title"]
+            soc = c["soc"]
+            req_skills = c["required_skills"]
+            tech_skills = c["technology_skills"]
+            domain = c["domain"]
+
+            # Compute ACTUAL matching skills: ONLY skills from the candidate requirement that student actually has!
+            matching = []
+            for sk in req_skills + tech_skills:
+                if has_skill(sk) and sk not in matching:
+                    matching.append(sk)
+
+            # Compute ACTUAL missing skills
+            missing = []
+            for sk in req_skills:
+                if not has_skill(sk) and sk not in missing:
+                    missing.append(sk)
+            for sk in tech_skills:
+                if not has_skill(sk) and sk not in missing and len(missing) < 5:
+                    missing.append(sk)
+
+            # Realistic 6-Dimension Score Calculation
+            # D1: Required Skills Coverage (38 points max)
+            req_match_cnt = len([sk for sk in req_skills if has_skill(sk)])
+            req_ratio = req_match_cnt / max(len(req_skills), 1)
+            score_d1 = req_ratio * 38.0
+
+            # D2: Technology Skills Coverage (12 points max)
+            tech_match_cnt = len([t for t in tech_skills if has_skill(t)])
+            tech_ratio = tech_match_cnt / max(len(tech_skills), 1)
+            score_d2 = tech_ratio * 12.0
+
+            # D3: Project Evidence (15 points max)
+            if project_techs:
+                proj_overlap = len([t for t in (req_skills + tech_skills) if t.lower() in project_techs])
+                score_d3 = min(15.0, 4.0 + (proj_overlap * 3.5))
+            else:
+                score_d3 = 3.0  # baseline without projects
+
+            # D4: Interest & Career Goal Fit (15 points max)
+            t_low = title.lower()
+            d_low = domain.lower()
+            t_words = set(re.findall(r"\w+", t_low + " " + d_low))
+            int_words = set(re.findall(r"\w+", interests_str + " " + goals_str))
+            int_words = {w for w in int_words if len(w) > 2 and w not in {"and", "the", "for", "with", "general", "developer", "development", "specialist"}}
+            if t_words.intersection(int_words):
+                score_d4 = 14.0
+            elif any(w in interests_str or w in goals_str for w in [t_low, d_low]) or any(w in t_low for w in interests_str.split(",")):
+                score_d4 = 14.0
+            elif any(w in interests_str for w in ["web", "software", "tech", "computer", "data"]):
+                score_d4 = 9.0
+            else:
+                score_d4 = 3.0
+
+            # D5: Degree Suitability (12 points max)
+            score_d5 = 11.0
+
+            # D6: Foundational & Transferable (8 points max)
+            score_d6 = 7.0 if confirmed_skills else 2.0
+
+            total_score = int(round(score_d1 + score_d2 + score_d3 + score_d4 + score_d5 + score_d6))
+            total_score = max(18, min(95, total_score))
+
+            if matching:
+                reason = (
+                    f"You have confirmed competencies in {', '.join(matching)}, providing foundational layout alignment for {title}. "
+                    f"To reach full internship readiness, focus on acquiring {', '.join(missing[:2])}."
+                )
+            else:
+                reason = (
+                    f"Foundational interest in {title}, but missing direct technical prerequisites in {', '.join(missing[:2])}."
+                )
+
+            recommendations.append({
+                "occupation_title": title,
+                "soc_code": soc,
+                "match_score": total_score,
+                "matching_skills": matching if matching else ["Foundational Computing"],
+                "missing_skills": missing if missing else ["Industry Standards", "System Architecture"],
+                "project_relevance": "Demonstrated via portfolio code" if project_techs else "Coursework foundation without verified project implementation",
+                "interest_alignment": f"Directly aligns with {domain} interest" if score_d4 >= 10 else "General computing interest",
+                "reason": reason,
+                "improvement_suggestions": [
+                    f"Build a practical hands-on mini-project demonstrating {missing[0]}" if missing else "Deepen project portfolio",
+                    f"Gain familiarity with {missing[1]}" if len(missing) > 1 else "Prepare for technical interviews"
+                ],
+                "confidence": "High" if total_score >= 75 and project_techs else ("Moderate" if total_score >= 50 else "Low")
+            })
+
+        # Sort recommendations by match score descending
         recommendations.sort(key=lambda x: x["match_score"], reverse=True)
         return json.dumps(recommendations[:6], indent=2)
 
     def _simulate_skill_gap_agent(self, user_prompt: str) -> str:
-        """Simulate Skill Gap Analysis Agent."""
+        """Simulate Skill Gap Analysis Agent evaluating real student skills against target role."""
+        # Extract student skills
+        skills_match = re.search(r"(?:Confirmed Skills|Student Skills):\s*([^\n\r]+)", user_prompt, re.IGNORECASE)
+        raw_sk = skills_match.group(1).strip() if skills_match else ""
+        student_skills = [
+            s.strip() for s in raw_sk.split(",")
+            if s.strip() and s.strip().lower() not in ["none listed", "none explicitly listed"]
+        ]
+        s_lower_set = {s.lower() for s in student_skills}
+
+        # Extract required skills and tech skills of target occupation
+        req_match = re.search(r"(?:Core Required Skills|Required Skills):\s*([^\n\r]+)", user_prompt, re.IGNORECASE)
+        raw_req = req_match.group(1).strip() if req_match else ""
+        req_skills = [s.strip() for s in raw_req.split(",") if s.strip()]
+
+        tech_match = re.search(r"Technology Skills:\s*([^\n\r]+)", user_prompt, re.IGNORECASE)
+        raw_tech = tech_match.group(1).strip() if tech_match else ""
+        tech_skills = [s.strip() for s in raw_tech.split(",") if s.strip()]
+
+        def normalize_skill(sk):
+            return re.sub(r"[^a-z0-9]", "", sk.lower())
+
+        def has_skill(cand_sk):
+            c_norm = normalize_skill(cand_sk)
+            for s in student_skills:
+                s_norm = normalize_skill(s)
+                if s_norm == c_norm:
+                    return True
+                pairs = [
+                    ({"html", "html5"}),
+                    ({"css", "css3"}),
+                    ({"js", "javascript"}),
+                    ({"py", "python"}),
+                    ({"ts", "typescript"}),
+                ]
+                for p in pairs:
+                    if s_norm in p and c_norm in p:
+                        return True
+            return False
+
+        matching_unique = []
+        for sk in req_skills + tech_skills:
+            if has_skill(sk) and sk not in matching_unique:
+                matching_unique.append(sk)
+
+        missing_essential = [sk for sk in req_skills if not has_skill(sk)]
+        missing_tech = [t for t in tech_skills if not has_skill(t)]
+
+        essential_items = [
+            {"name": sk, "priority": "High", "impact": "Core prerequisite requirement for this occupational standard."}
+            for sk in missing_essential[:3]
+        ]
+        if not essential_items:
+            essential_items = [{"name": "Advanced Architecture", "priority": "Medium", "impact": "Enterprise scaling."}]
+
+        additional_items = [
+            {"name": sk, "priority": "Medium", "impact": "Standard developer toolchain competency."}
+            for sk in missing_tech[:3]
+        ]
+        if not additional_items:
+            additional_items = [{"name": "CI/CD & DevOps", "priority": "Medium", "impact": "Automated deployment."}]
+
+        transferable = []
+        if "html" in s_lower_set or "css" in s_lower_set:
+            transferable.append({"name": "Visual Hierarchy & Layout", "context": "Directly transfers from HTML/CSS markup to component design."})
+            transferable.append({"name": "Web Standards Awareness", "context": "Understanding semantic tags aids in accessibility and search optimization."})
+        elif "python" in s_lower_set:
+            transferable.append({"name": "Algorithmic Scripting", "context": "Python data structure skills transfer across backend and analytics."})
+        else:
+            transferable.append({"name": "Problem Solving", "context": "Academic computer science foundation transfers to debugging."})
+
+        first_missing = missing_essential[0] if missing_essential else "Git Version Control"
+        suggestions = [
+            f"Build a focused practical project demonstrating {first_missing}.",
+            f"Practice writing clean code and versioning your changes using Git.",
+            f"Review standard technical interview concepts for this role."
+        ]
+
         output = {
-            "existing_skills": ["Python", "SQL", "Git"],
-            "matching_skills": ["Python", "SQL"],
-            "missing_essential_skills": [
-                {"name": "Production Docker & Containerization", "priority": "High", "impact": "Prerequisite for deploying scalable services in modern team workflows."},
-                {"name": "Automated Unit Testing & CI/CD", "priority": "High", "impact": "Ensures reliability and test coverage for collaborative codebases."}
-            ],
-            "additional_recommended_skills": [
-                {"name": "Cloud Deployment (AWS / GCP Basics)", "priority": "Medium", "impact": "Expands practical systems architecture versatility."},
-                {"name": "Microservices Communication (REST / gRPC)", "priority": "Medium", "impact": "Enhances distributed software modularity."}
-            ],
-            "transferable_skills": [
-                {"name": "Analytical Problem Solving", "context": "Directly transfers from academic computer science algorithms to real-world edge-case debugging."},
-                {"name": "Modular Software Design", "context": "Applies across all object-oriented and functional software domains."}
-            ],
-            "skills_requiring_verification": ["System Scalability", "Production Database Indexing"],
-            "practical_improvement_suggestions": [
-                "Build and containerize an end-to-end project using Docker and publish images to Docker Hub.",
-                "Integrate automated test runs into GitHub Actions for all pull requests.",
-                "Deploy the service to a free-tier cloud host (e.g. AWS or Render) with environment isolation."
-            ]
+            "existing_skills": student_skills if student_skills else ["Foundational Computing"],
+            "matching_skills": matching_unique if matching_unique else ["Foundational Knowledge"],
+            "missing_essential_skills": essential_items,
+            "additional_recommended_skills": additional_items,
+            "transferable_skills": transferable,
+            "skills_requiring_verification": ["Production Scalability", "System Optimization"],
+            "practical_improvement_suggestions": suggestions
         }
         return json.dumps(output, indent=2)
 
@@ -309,7 +514,7 @@ class DemoProvider(BaseLLMProvider):
         return json.dumps(output, indent=2)
 
     def _simulate_assistant_agent(self, user_prompt: str) -> str:
-        """Simulate Conversational Career Assistant Agent with highly responsive, context-aware answers."""
+        """Simulate Conversational Career Assistant Agent with direct, concise, and accurate answers."""
         # 1. Extract user message
         user_msg = ""
         if "STUDENT MESSAGE:" in user_prompt:
@@ -317,7 +522,7 @@ class DemoProvider(BaseLLMProvider):
         else:
             user_msg = user_prompt.strip()
 
-        msg_low = user_msg.lower()
+        msg_low = user_msg.lower().strip()
 
         # 2. Extract student metadata from prompt if available
         student_name = "there"
@@ -333,143 +538,127 @@ class DemoProvider(BaseLLMProvider):
         skills = []
         match_skills = re.search(r"Confirmed Skills:\s*([^\n\r]+)", user_prompt)
         if match_skills and match_skills.group(1).strip():
-            skills = [s.strip() for s in match_skills.group(1).split(",") if s.strip()]
+            raw_s = match_skills.group(1).strip()
+            if raw_s.lower() not in ["none listed", "none explicitly listed"]:
+                skills = [s.strip() for s in raw_s.split(",") if s.strip()]
 
-        top_role = "Software Development Role"
-        match_roles = re.search(r"#1:\s*([^(\n\r]+)", user_prompt)
-        if match_roles and match_roles.group(1).strip():
-            top_role = match_roles.group(1).strip()
+        skill_summary = ", ".join(skills) if skills else "your declared skills"
 
-        skill_summary = ", ".join(skills[:4]) if skills else "core programming"
+        # Extract top role and match score from prompt
+        top_role = "Web Developer (Frontend)"
+        top_score = 52
+        match_role = re.search(r"#1:\s*([^(\n\r]+)\s*\(Match:\s*(\d+)/100", user_prompt)
+        if match_role:
+            top_role = match_role.group(1).strip()
+            top_score = int(match_role.group(2))
+        else:
+            match_role_fallback = re.search(r"#1:\s*([^(\n\r]+)", user_prompt)
+            if match_role_fallback:
+                top_role = match_role_fallback.group(1).strip()
 
-        # 3. Dynamic Topic Matchers based on User's EXACT Question
-        # Interview & Coding Prep
-        if any(w in msg_low for w in ["interview", "coding round", "technical round", "online assessment", "oa"]):
+        second_role = ""
+        match_role2 = re.search(r"#2:\s*([^(\n\r]+)", user_prompt)
+        if match_role2:
+            second_role = match_role2.group(1).strip()
+
+        # Extract missing skills from prompt
+        missing_skills_str = ""
+        match_gaps = re.search(r"Active Skill Gaps:\s*([^\n\r]+)", user_prompt)
+        if match_gaps and match_gaps.group(1).strip() and match_gaps.group(1).strip().lower() != "none identified yet.":
+            missing_skills_str = match_gaps.group(1).strip()
+        else:
+            s_lows = [s.lower() for s in skills]
+            if "html" in s_lows or "css" in s_lows:
+                missing_skills_str = "JavaScript, Git, React"
+            elif "python" in s_lows:
+                missing_skills_str = "SQL, Docker, Cloud Deployment"
+            elif "java" in s_lows:
+                missing_skills_str = "Spring Boot, Docker, REST APIs"
+            else:
+                missing_skills_str = "Core Programming, Version Control"
+
+        raw_missing = [m.strip() for m in missing_skills_str.split(",") if m.strip()]
+
+        def normalize_skill(sk):
+            return re.sub(r"[^a-z0-9]", "", sk.lower())
+
+        s_norms = {normalize_skill(s) for s in skills}
+        # Filter out any skill the student already has
+        missing_list = [m for m in raw_missing if normalize_skill(m) not in s_norms]
+        if not missing_list:
+            missing_list = ["JavaScript", "Git", "React"] if any(s.lower() in ["html", "css"] for s in skills) else ["System Design", "Cloud Infrastructure"]
+        first_missing = missing_list[0]
+
+        # 3. Direct, Focused Answers Based on User's Question
+        # Question: What is my role / suitable roles?
+        if any(w in msg_low for w in ["what is my role", "what role", "which role", "my role", "what job", "suitable for", "what am i suitable"]):
+            ans = f"Based on your profile, your primary recommended role is **{top_role}** (Suitability Match: **{top_score}%**)"
+            if second_role:
+                ans += f", followed by **{second_role}**"
+            ans += f".\n\nWith your skills in **{skill_summary}**, you have foundational alignment for this path. To qualify for competitive internships, learning **{first_missing}** is your most important next step."
+            return ans
+
+        # Question: Skills needed / what to learn?
+        elif any(w in msg_low for w in ["skills needed", "what skills", "which skills", "what to learn", "missing skills", "skills required", "needed skills"]):
+            bullet_items = "\n".join([f"  {idx+1}. **{m}** (Priority)" for idx, m in enumerate(missing_list[:3])])
             return (
-                f"Great question regarding technical interviews, {student_name}!\n\n"
-                f"For internship roles in {top_role}, technical evaluations typically follow three distinct stages:\n\n"
-                f"1. **Online Coding Assessment (OA):** Focus heavily on Data Structures & Algorithms. Practice medium-difficulty LeetCode problems on Arrays, Strings, Hash Maps, and Two Pointers. For your background in {skill_summary}, ensure you can write clean, bug-free solutions with proper time & space complexity analysis.\n\n"
-                f"2. **Core CS Fundamentals:** Expect questions on Object-Oriented Programming (OOPS), Database normalization/indexing, and basic Operating Systems concepts (processes, threads, deadlocks).\n\n"
-                f"3. **Project Deep-Dive:** Be prepared to walk through your projects line by line. Interviewers will ask: *'Why did you choose this technology?', 'How did you handle edge cases?',* and *'How would you scale this to 10,000 users?'*\n\n"
-                f"**Pro Tip:** Always articulate your thought process out loud before typing any code!"
+                f"For **{top_role}**, here is your exact skill roadmap:\n\n"
+                f"• **Skills you have:** {skill_summary}\n"
+                f"• **Essential skills to learn next:**\n{bullet_items}\n\n"
+                f"Start with **{first_missing}** first, as it is the most critical requirement for entry-level roles."
             )
 
-        # DSA & LeetCode
-        elif any(w in msg_low for w in ["dsa", "leetcode", "algorithm", "data structure"]):
+        # Question: Is HTML/CSS enough?
+        elif any(w in msg_low for w in ["enough", "only html", "only css"]):
             return (
-                f"Here is a structured approach to mastering DSA for your internship search, {student_name}:\n\n"
-                f"1. **Foundational Topics (Weeks 1-3):** Master Arrays, Strings, Hash Tables, and Two-Pointer patterns. Solve 20-25 problems until pattern recognition becomes second nature.\n"
-                f"2. **Intermediate Topics (Weeks 4-6):** Recursion, Linked Lists, Stacks, Queues, and Binary Search. Focus on boundary conditions.\n"
-                f"3. **Advanced Topics (Weeks 7-8):** Trees, Depth-First Search (DFS), Breadth-First Search (BFS), and basic Dynamic Programming.\n\n"
-                f"Quality beats quantity: thoroughly solving 75 curated problems (like Blind 75) is far more effective than skimming 300 solutions without retention."
+                f"Knowing **{skill_summary}** is a great start for web layout and styling, but on its own it is generally **not enough** for professional internships.\n\n"
+                f"To be internship-ready, you also need:\n"
+                f"1. **JavaScript** (for DOM manipulation, event handling, and interactivity)\n"
+                f"2. **Git & GitHub** (for version control and team code collaboration)\n\n"
+                f"Adding basic JavaScript will immediately make you eligible for Junior Web Development opportunities!"
             )
 
-        # Resume & CV
-        elif any(w in msg_low for w in ["resume", "cv", "portfolio", "github"]):
+        # Question: How to prepare?
+        elif any(w in msg_low for w in ["how to prepare", "where to start", "how to start", "what should i do", "how do i prepare"]):
             return (
-                f"Here are key recommendations to make your resume stand out for {top_role} internships, {student_name}:\n\n"
-                f"1. **Single-Page Limit:** Keep your resume strictly to 1 page using a clean, ATS-compliant single-column template.\n"
-                f"2. **Impact-Driven Project Bullets:** Use the XYZ formula (*'Accomplished [X] as measured by [Y] by doing [Z]'*). Instead of *'Built a web app with React'*, write: *'Architected a responsive single-page store in React, implementing cart state persistence and reducing client-side load time by 35% via code-splitting.'*\n"
-                f"3. **Clean GitHub Presence:** Pin your top 2-3 repositories. Every pinned repo must feature a comprehensive README, an architectural diagram, installation commands, and ideally a live deployed URL (e.g. on Vercel, Netlify, or Render).\n"
-                f"4. **Skills Section:** Group skills into Languages, Frameworks, Developer Tools, and Databases."
+                f"Here is a simple 3-step action plan to prepare for **{top_role}** internships:\n\n"
+                f"1. **Build a project:** Create a small website using your current skills ({skill_summary}).\n"
+                f"2. **Add {first_missing}:** Implement basic interactive features using {first_missing}.\n"
+                f"3. **Publish to GitHub:** Upload your code with a clear README so recruiters can see it.\n\n"
+                f"This hands-on proof is what matters most to hiring managers."
             )
 
-        # How to find / apply for internships (Off-Campus / Cold Outreach)
-        elif any(w in msg_low for w in ["how to apply", "find internship", "get internship", "off campus", "cold email", "hiring"]):
+        # Question: Interview questions?
+        elif any(w in msg_low for w in ["interview", "questions", "coding test"]):
             return (
-                f"Finding quality tech internships requires a multi-channel strategy, {student_name}:\n\n"
-                f"1. **LinkedIn Alumni Outreach:** Reach out to college alumni currently working in {top_role} positions. Send a brief, polite note: *'Hi [Name], I'm a student at [College] passionate about [Domain]. I loved your recent post on [Topic] and would value 10 minutes of advice on preparing for internships at [Company].'*\n"
-                f"2. **Early-Stage Startups (Wellfound / AngelList):** Startups provide incredible hands-on mentorship and faster interview turnaround compared to corporate queues.\n"
-                f"3. **Open Source Contributions:** Find active open-source repositories on GitHub tagged with `good-first-issue`. Contributing bug fixes or documentation proves real-world teamwork skills before you even interview.\n"
-                f"4. **Targeted Job Portals:** Check official career portals in August–October for summer roles, and January–March for off-cycle roles."
+                f"Here are 3 standard interview questions for **{top_role}**:\n\n"
+                f"1. *'Explain the CSS Box Model and how padding, border, and margin differ.'*\n"
+                f"2. *'What is semantic HTML and why does it matter for accessibility and SEO?'*\n"
+                f"3. *'How do you make a webpage responsive across mobile and desktop devices?'*\n\n"
+                f"Be ready to explain your answers with practical examples from your code."
             )
 
-        # Specific Technology Questions
-        elif "docker" in msg_low or "container" in msg_low:
+        # Question: Project ideas?
+        elif any(w in msg_low for w in ["project", "build", "portfolio"]):
             return (
-                f"Docker is one of the highest-return skills you can learn right now, {student_name}!\n\n"
-                f"**Why it matters:** In team environments, 'it works on my machine' is unacceptable. Docker packages your application code, runtime, system tools, and libraries into a lightweight, reproducible container.\n\n"
-                f"**How to master it in 3 steps:**\n"
-                f"1. Write a `Dockerfile` for your existing project (use multi-stage builds to keep image sizes small).\n"
-                f"2. Write a `docker-compose.yml` file to orchestrate both your application and a database (e.g. PostgreSQL or MySQL) on a shared network.\n"
-                f"3. Push your image to Docker Hub and test pulling it on a fresh machine or free cloud VM."
+                f"Here are 2 high-impact project ideas for **{top_role}** based on your skills ({skill_summary}):\n\n"
+                f"1. **Responsive Portfolio Website:** Build a clean personal portfolio showcasing your background and skills with custom CSS Flexbox/Grid.\n"
+                f"2. **Interactive Landing Page:** Create a responsive product showcase with a navigation bar, pricing cards, and a contact form.\n\n"
+                f"Host them live for free on GitHub Pages so recruiters can view them with one click."
             )
 
-        elif "react" in msg_low or "frontend" in msg_low:
+        # Question: Salary / Vacancy / Hiring?
+        elif any(w in msg_low for w in ["salary", "stipend", "vacancy", "openings", "hiring"]):
             return (
-                f"For modern Frontend / React internships, focus on these core competencies, {student_name}:\n\n"
-                f"1. **React Fundamentals:** Functional components, Hooks (`useState`, `useEffect`, `useCallback`, `useMemo`), and custom hooks.\n"
-                f"2. **State Management:** Master local vs. global state (Context API, Zustand, or Redux Toolkit).\n"
-                f"3. **Web Standards & Performance:** Semantic HTML5, accessible ARIA attributes, responsive CSS layouts (Flexbox/Grid), and Core Web Vitals (LCP, FID, CLS).\n"
-                f"4. **Build a Capstone:** Build a rich, interactive web application consuming third-party REST APIs with client-side routing, loading skeletons, and error boundaries."
+                f"PathMatch AI evaluates occupational skill suitability based on O*NET standards; it does not list live job vacancies or commercial salaries.\n\n"
+                f"However, entry-level internships for **{top_role}** typically offer competitive stipends once you master {skill_summary} and basic {first_missing}."
             )
 
-        elif "python" in msg_low or "machine learning" in msg_low or "data science" in msg_low or "ai" in msg_low:
-            return (
-                f"For AI and Data Science internships, hiring managers look for practical end-to-end execution, {student_name}:\n\n"
-                f"1. **Data Wrangling:** Solid mastery of Pandas and NumPy for cleaning messy tabular data, handling missing values, and reshaping dataframes.\n"
-                f"2. **Scikit-learn Pipelines:** Don't just call `.fit()` and `.predict()`. Build clean `Pipeline` and `ColumnTransformer` workflows that prevent data leakage and implement k-fold cross-validation.\n"
-                f"3. **Model Interpretability:** Understand precision, recall, F1-score, ROC-AUC, and feature importances rather than relying solely on raw accuracy.\n"
-                f"4. **Interactive Deployment:** Wrap your trained model in a Streamlit dashboard or FastAPI endpoint and deploy it online so recruiters can test it live."
-            )
-
-        elif "java" in msg_low or "spring" in msg_low or "backend" in msg_low:
-            return (
-                f"For Backend Java and Enterprise Software internships, here is what sets top candidates apart, {student_name}:\n\n"
-                f"1. **Spring Boot Architecture:** Understand `@RestController`, `@Service`, and `@Repository` layers and Dependency Injection (Inversion of Control).\n"
-                f"2. **Data Persistence:** Spring Data JPA, Hibernate entity lifecycles, and writing optimized JPQL queries.\n"
-                f"3. **RESTful API Standards:** Proper HTTP status codes (201 Created, 204 No Content, 400 Bad Request, 404 Not Found), request validation with `@Valid`, and custom global exception handlers (`@ControllerAdvice`).\n"
-                f"4. **Database Transactions:** Understand `@Transactional` boundaries, ACID guarantees, and connection pooling."
-            )
-
-        elif "cybersecurity" in msg_low or "network" in msg_low or "security" in msg_low or "linux" in msg_low:
-            return (
-                f"For Cybersecurity and Network Engineering internships, practical hands-on lab experience is key, {student_name}:\n\n"
-                f"1. **Networking Protocols:** Master the OSI 7-layer model and TCP/IP stack. Understand how TCP handshakes, DNS resolution, DHCP, and ARP operate under the hood.\n"
-                f"2. **Packet Analysis:** Use Wireshark to capture and inspect live network traffic, identifying anomalous packet sequences or plaintext credentials.\n"
-                f"3. **Linux Command Line:** Comfort with Linux permissions (`chmod`, `chown`), process management (`ps`, `top`), network utilities (`netstat`, `ss`, `iptables`), and Bash scripting.\n"
-                f"4. **Security Concepts:** Familiarize yourself with the OWASP Top 10 vulnerabilities (SQLi, XSS, CSRF, IDOR) and write remediation guides."
-            )
-
-        elif "sql" in msg_low or "database" in msg_low:
-            return (
-                f"For Database and Data Engineering roles, focus on these critical areas, {student_name}:\n\n"
-                f"1. **Complex Queries:** Master multi-table `INNER`, `LEFT`, and `FULL OUTER` JOINs, subqueries, and Window Functions (`ROW_NUMBER()`, `RANK()`, `LEAD()`, `LAG()`).\n"
-                f"2. **Database Design:** Normalization (1NF through 3NF), primary keys, foreign key constraints, and indexing strategies (B-Trees vs. Hash indexes).\n"
-                f"3. **Transactions:** Understand ACID properties and how isolation levels prevent dirty reads and phantom reads."
-            )
-
-        elif "project" in msg_low or "build" in msg_low:
-            return (
-                f"Based on your profile with skills in {skill_summary}, here is an impactful project concept you can build, {student_name}:\n\n"
-                f"**Project Concept:** *Full-Stack Analytical Dashboard with Role-Based Access*\n"
-                f"- **Core Tech:** Connect your preferred language ({skill_summary}) with an API backend and an interactive client interface.\n"
-                f"- **Key Features:** User authentication (JWT), database persistence, automated test suite, and containerized deployment with Docker.\n"
-                f"- **Why Recruiters Love It:** It proves you understand full-lifecycle development: architecture, validation, security, testing, and deployment."
-            )
-
-        elif "gap" in msg_low or "missing" in msg_low or "what to learn" in msg_low:
-            return (
-                f"Looking at your profile against industry standards for {top_role}, here are your two highest-priority areas to address, {student_name}:\n\n"
-                f"1. **Production Deployment & CI/CD:** Learning Docker containerization and automated GitHub Actions test runs will immediately put you in the top tier of applicants.\n"
-                f"2. **Cloud Fundamentals:** Getting familiar with basic cloud hosting (AWS or Render/Railway) demonstrates that you understand how code runs outside of localhost."
-            )
-
-        elif "why am i suitable" in msg_low or "suitability" in msg_low:
-            return (
-                f"You have strong alignment for {top_role}, {student_name}!\n\n"
-                f"Specifically, your verified competencies in {skill_summary} match the core prerequisite requirements cataloged in the O*NET database. "
-                f"Your academic foundation in {degree} provides the theoretical grounding, and adding one production-grade portfolio project will cement your internship readiness."
-            )
-
-        # Dynamic Synthesizer for ANY OTHER general question
+        # Fallback: Simple, direct 2-3 sentence answer targeting the query
         else:
             clean_q = user_msg.replace("?", "").strip()
             return (
-                f"Regarding your inquiry about **'{clean_q}'**, {student_name}:\n\n"
-                f"As a {degree} student targeting roles in **{top_role}**, here is how you should think about this:\n\n"
-                f"1. **Core Relevance:** In modern software engineering, mastering fundamentals and understanding *how systems fit together* matters far more than memorizing syntax. With your current background in {skill_summary}, exploring this will broaden your practical versatility.\n\n"
-                f"2. **Actionable Implementation:** The best way to approach this is through hands-on experimentation. Try building a small proof-of-concept script or module that directly tests this concept.\n\n"
-                f"3. **Connecting to Your Career Goals:** Document your learnings in a technical blog post or add it as an enhancement to your GitHub portfolio. Demonstrating curiosity and continuous learning is one of the top traits internship interviewers evaluate.\n\n"
-                f"Feel free to ask for specific code examples, project architectures, or study resources on this topic!"
+                f"Regarding **'{clean_q}'**:\n\n"
+                f"For your target path in **{top_role}**, the most important next step is applying your current knowledge in {skill_summary} while learning {first_missing}. "
+                f"Feel free to ask about specific skills, interview questions, or project ideas!"
             )

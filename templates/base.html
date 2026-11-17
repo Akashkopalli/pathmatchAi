@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PathMatch AI — Intelligent Internship Role Recommendation Engine{% endblock %}</title>
+    <!-- Prevent Theme Flash -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('pathmatch_theme') || 
+                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            } catch(e) {}
+        })();
+    </script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_static('images/logo-icon.svg') if url_static is defined else '/static/images/logo-icon.svg' }}">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Plus Jakarta Sans (Headings/UI) + Inter (Body) + JetBrains Mono (Code/Badges) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Custom Style -->
     <link rel="stylesheet" href="{{ url_static('css/style.css') if url_static is defined else '/static/css/style.css' }}">
     {% block extra_head %}{% endblock %}
@@ -28,12 +41,10 @@
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm border-bottom border-secondary-subtle">
         <div class="container-fluid px-lg-5">
-            <a class="navbar-brand d-flex align-items-center" href="/">
-                <div class="brand-icon me-2">
-                    <i class="fa-solid fa-compass fa-lg text-primary"></i>
-                </div>
+            <a class="navbar-brand d-flex align-items-center py-1" href="/">
+                <img src="{{ url_static('images/logo-icon.svg') if url_static is defined else '/static/images/logo-icon.svg' }}" alt="PathMatch AI" width="32" height="32" class="me-2 rounded-3 shadow-sm">
                 <div>
-                    <span class="fw-bold tracking-tight text-white">PathMatch</span>
+                    <span class="fw-bold tracking-tight text-white fs-5">Path<span class="text-info">Match</span></span>
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle ms-1 text-uppercase" style="font-size: 0.65rem;">AI Engine</span>
                 </div>
             </a>
@@ -78,6 +89,11 @@
                     <span class="badge bg-dark border border-secondary text-secondary-emphasis d-none d-md-inline-block font-monospace" style="font-size: 0.75rem;">
                         <i class="fa-solid fa-robot text-info me-1"></i> {{ llm_provider | upper }}: {{ llm_model }}
                     </span>
+                    <!-- Theme Toggle Button -->
+                    <button type="button" class="btn btn-sm theme-toggle-btn rounded-pill px-3 d-flex align-items-center gap-2" id="themeToggleBtn" onclick="toggleTheme()" title="Switch between Dark and Light mode" aria-label="Toggle theme">
+                        <i class="fa-solid fa-moon" id="themeToggleIcon"></i>
+                        <span class="d-none d-sm-inline small fw-semibold" id="themeToggleLabel">Theme</span>
+                    </button>
                     <a href="/profile" class="btn btn-primary btn-sm px-3 shadow-sm">
                         <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Analyze Profile
                     </a>
@@ -97,8 +113,8 @@
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="d-flex align-items-center mb-2">
-                        <i class="fa-solid fa-compass text-primary fs-4 me-2"></i>
-                        <span class="fw-bold fs-5 text-white">PathMatch AI</span>
+                        <img src="{{ url_static('images/logo-icon.svg') if url_static is defined else '/static/images/logo-icon.svg' }}" alt="PathMatch AI" width="28" height="28" class="me-2 rounded-2">
+                        <span class="fw-bold fs-5 text-white">Path<span class="text-info">Match</span> AI</span>
                     </div>
                     <p class="text-secondary small mb-3">
                         SIH25034 — Smart India Hackathon Innovation. Pure LLM-Powered Internship Role Recommendation and Career Guidance System.
@@ -157,6 +173,39 @@
 
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Global Theme Switcher Script -->
+    <script>
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            try {
+                localStorage.setItem('pathmatch_theme', newTheme);
+            } catch(e) {}
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            const icon = document.getElementById('themeToggleIcon');
+            const label = document.getElementById('themeToggleLabel');
+            if (icon) {
+                if (theme === 'dark') {
+                    icon.className = 'fa-solid fa-sun text-warning';
+                    if (label) label.textContent = 'Light';
+                } else {
+                    icon.className = 'fa-solid fa-moon text-info';
+                    if (label) label.textContent = 'Dark';
+                }
+            }
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: theme } }));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(currentTheme);
+        });
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
