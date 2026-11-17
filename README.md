@@ -5,7 +5,8 @@
 <h2 align="center">PathMatch AI</h2>
 <p align="center">
   <b>Intelligent LLM-Powered Internship Role Recommendation & Career Guidance System</b><br>
-  <i>Smart India Hackathon Innovation (SIH25034)</i>
+  <i>Smart India Hackathon Innovation (SIH25034)</i><br>
+  <b>Developed & Created by <a href="https://github.com/Akashkopalli">Akash Kopalli</a></b>
 </p>
 
 <p align="center">
@@ -275,7 +276,16 @@ tests/test_recommendations.py ......                                     [100%]
 
 ---
 
+## 13. Author & Creator
+
+* **Developer & Author:** **Akash Kopalli**
+* **GitHub Profile:** [@Akashkopalli](https://github.com/Akashkopalli)
+* **Repository:** [PathMatch AI](https://github.com/Akashkopalli/pathmatchAi)
+* **Email:** [kopallimani45@gmail.com](mailto:kopallimani45@gmail.com)
+
+---
+
 <p align="center">
-  <b>Smart India Hackathon (SIH25034)</b><br>
-  <i>Designed and engineered with Pure LLM Multi-Agent Intelligence.</i>
+  <b>PathMatch AI &bull; Smart India Hackathon (SIH25034)</b><br>
+  <i>Designed and developed by <b>Akash Kopalli</b> with Pure LLM Multi-Agent Intelligence.</i>
 </p>

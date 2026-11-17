@@ -1,6 +1,7 @@
 # PathMatch AI — Comprehensive Technical Report
 ## Intelligent LLM-Powered Internship Role Recommendation & Career Guidance System
 **Project Code:** SIH25034 — Smart India Hackathon Innovation  
+**Lead Developer & Author:** Akash Kopalli ([@Akashkopalli](https://github.com/Akashkopalli))  
 **System Status:** Production-Ready Prototype & Verified Benchmark Suite  
 **Date:** November 2026 | **Version:** 1.0.0  
 
