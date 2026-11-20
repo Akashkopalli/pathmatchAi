@@ -260,3 +260,4 @@ if __name__ == "__main__":
     create_evaluation_rubric()
     create_onet_taxonomy()
     print("All technical diagrams generated successfully!")
+

@@ -306,3 +306,4 @@ def set_cell_background(cell, color_hex):
 if __name__ == "__main__":
     build_pdf_report()
     build_docx_report()
+
